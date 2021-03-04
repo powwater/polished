@@ -145,8 +145,7 @@ secure_server <- function(
       query_list <- shiny::getQueryString()
       hold_user <- session$userData$user()
 
-      if (isTRUE(hold_user$email_verified) ||
-          isFALSE(.global_sessions$is_email_verification_required)) {
+      if (isTRUE(hold_user$email_verified)) {
 
 
         is_on_admin_page <- if (

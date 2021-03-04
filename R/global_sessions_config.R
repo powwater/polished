@@ -23,8 +23,6 @@
 #' @param api_url the API url.  Defaults to \code{"https://api.polished.tech"}.
 #' @param sign_in_providers the sign in providers to enable.  Valid values are \code{"google"}
 #' \code{"email"}, \code{"microsoft"}, and/or \code{"facebook"}. Defaults to \code{"email"}.
-#' @param is_email_verification_required \code{TRUE} by default.  Whether or not to require the user to
-#' verify their email before accessing your Shiny app.
 #' @param is_auth_required \code{TRUE} by default.  Whether or not to require users to be signed
 #' in to access the app.  It can be useful to set this argument to \code{FALSE} if you want to
 #' allow user to do certain actions (such as viewing charts and tables) without signing in,
@@ -56,7 +54,6 @@ global_sessions_config <- function(
   is_invite_required = TRUE,
   api_url = "https://api.polished.tech",
   sign_in_providers = "email",
-  is_email_verification_required = TRUE,
   is_auth_required = TRUE,
   sentry_dsn = NULL
 ) {
@@ -118,7 +115,6 @@ global_sessions_config <- function(
     admin_mode = admin_mode,
     is_invite_required = is_invite_required,
     sign_in_providers = sign_in_providers,
-    is_email_verification_required = is_email_verification_required,
     is_auth_required = is_auth_required
   )
 

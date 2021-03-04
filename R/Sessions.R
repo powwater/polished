@@ -76,7 +76,6 @@ Sessions <-  R6::R6Class(
     firebase_config = NULL,
     is_invite_required = TRUE,
     sign_in_providers = character(0),
-    is_email_verification_required = TRUE,
     is_auth_required = TRUE,
     #' @description
     #' polished Sessions configuration function
@@ -92,7 +91,6 @@ Sessions <-  R6::R6Class(
       admin_mode = FALSE,
       is_invite_required = TRUE,
       sign_in_providers = "email",
-      is_email_verification_required = TRUE,
       is_auth_required = TRUE
     ) {
 
@@ -118,9 +116,6 @@ Sessions <-  R6::R6Class(
       if (!(length(is_invite_required) == 1 && is.logical(is_invite_required))) {
         stop("invalid `is_invite_required` argument passed to `global_sessions_config()`", call. = FALSE)
       }
-      if (!(length(is_email_verification_required) == 1 && is.logical(is_email_verification_required))) {
-        stop("invalid `is_email_verification_required` argument passed to `global_sessions_config()`", call. = FALSE)
-      }
       if (!(length(is_auth_required) == 1 && is.logical(is_auth_required))) {
         stop("invalid `is_auth_required` argument passed to `global_sessions_config()`", call. = FALSE)
       }
@@ -129,7 +124,6 @@ Sessions <-  R6::R6Class(
 
       private$admin_mode <- admin_mode
       self$is_invite_required <- is_invite_required
-      self$is_email_verification_required <- is_email_verification_required
       self$is_auth_required <- is_auth_required
 
       private$refresh_jwt_pub_key()
@@ -363,8 +357,7 @@ Sessions <-  R6::R6Class(
           email = email,
           password = password,
           hashed_cookie = hashed_cookie,
-          is_invite_required = self$is_invite_required,
-          is_email_verification_required = self$is_email_verification_required
+          is_invite_required = self$is_invite_required
         ),
         encode = "json",
         config = list(http_version = 0)

@@ -200,8 +200,7 @@ secure_ui <- function(
           tags$script(src = "polish/js/polished_session.js?version=2"),
           tags$script(paste0("polished_session('", user$hashed_cookie, "')"))
         )
-      } else if (isTRUE(user$email_verified) ||
-          isFALSE(.global_sessions$is_email_verification_required)) {
+      } else if (isTRUE(user$email_verified)) {
 
 
         if (identical(page_query, "account")) {
