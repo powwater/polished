@@ -1,6 +1,11 @@
 "use strict";
 
 var auth_main = function auth_main(ns_prefix) {
+  // Intl Telephone Input options
+  // var phone_input = document.querySelector(".intl-tel-input");
+  // window.intlTelInput(phone_input, {
+  //   utilsScript: "polish/intlTelInput/js/utils.js"
+  // });
   var cookie_options = {
     expires: 365
   }; // set cookie to expire in 1 year
@@ -10,13 +15,14 @@ var auth_main = function auth_main(ns_prefix) {
     // use cookies within iframes. Only works when app is running on https.
     cookie_options.sameSite = 'none';
     cookie_options.secure = true;
-  }
+  } // const sign_in = (email, password) => {
 
-  var sign_in = function sign_in(email, password) {
+
+  var sign_in = function sign_in(password) {
     var polished_cookie = "p" + Math.random();
     Cookies.set('polished', polished_cookie, cookie_options);
     Shiny.setInputValue("".concat(ns_prefix, "check_jwt"), {
-      email: email,
+      // email: email,
       password: password,
       cookie: polished_cookie
     }, {
@@ -25,7 +31,8 @@ var auth_main = function auth_main(ns_prefix) {
   };
 
   $(document).on("click", "#".concat(ns_prefix, "register_submit"), function () {
-    var email = $("#".concat(ns_prefix, "register_email")).val().toLowerCase();
+    // const email = $(`#${ns_prefix}register_email`).val().toLowerCase()
+    // const email = $(`#${ns_prefix}register_email`).val()
     var password = $("#".concat(ns_prefix, "register_password")).val();
     var password_2 = $("#".concat(ns_prefix, "register_password_verify")).val();
 
@@ -49,7 +56,7 @@ var auth_main = function auth_main(ns_prefix) {
     } // set cookie to expire in 1 year
     );
     Shiny.setInputValue("".concat(ns_prefix, "register_js"), {
-      email: email,
+      // email: email,
       password: password,
       cookie: polished_cookie
     }, {
@@ -57,8 +64,9 @@ var auth_main = function auth_main(ns_prefix) {
     });
   });
   $(document).on("click", "#".concat(ns_prefix, "sign_in_submit"), function () {
-    var email = $("#".concat(ns_prefix, "sign_in_email")).val().toLowerCase();
+    // const email = $(`#${ns_prefix}sign_in_email`).val()
+    // const email = $(`#${ns_prefix}sign_in_email`).val().toLowerCase()
     var password = $("#".concat(ns_prefix, "sign_in_password")).val();
-    sign_in(email, password);
+    sign_in(password);
   });
 };
