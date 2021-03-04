@@ -1,4 +1,4 @@
-Package: polished
+Package: powpolished
 Type: Package
 Title: Authentication and Administration for 'shiny' Apps
 Version: 0.2.0.9000
