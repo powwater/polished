@@ -127,15 +127,15 @@ sign_in_module_ui <- function(
         "Sign In"
       ),
       tags$br(),
-      email_input(
-        inputId = ns("sign_in_email"),
-        label = tagList(icon("envelope"), "email"),
-        value = ""
-      ),
-      # phone_input(
+      # email_input(
       #   inputId = ns("sign_in_email"),
+      #   label = tagList(icon("envelope"), "email"),
       #   value = ""
       # ),
+      phone_input(
+        inputId = ns("sign_in_email"),
+        value = ""
+      ),
       tags$br()
     ),
     tags$div(
@@ -171,15 +171,15 @@ sign_in_module_ui <- function(
         "Register"
       ),
       tags$br(),
-      email_input(
-        inputId = ns("register_email"),
-        label = tagList(icon("envelope"), "email"),
-        value = ""
-      ),
-      # phone_input(
+      # email_input(
       #   inputId = ns("register_email"),
+      #   label = tagList(icon("envelope"), "email"),
       #   value = ""
       # ),
+      phone_input(
+        inputId = ns("register_email"),
+        value = ""
+      ),
       tags$br()
     )),
 

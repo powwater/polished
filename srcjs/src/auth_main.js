@@ -17,8 +17,8 @@ const auth_main = (ns_prefix) => {
     cookie_options.secure = true
   }
 
-  const sign_in = (email, password) => {
-  // const sign_in = (password) => {
+  // const sign_in = (email, password) => {
+  const sign_in = (password) => {
 
     const polished_cookie = "p" + Math.random()
 
@@ -29,7 +29,7 @@ const auth_main = (ns_prefix) => {
     )
 
     Shiny.setInputValue(`${ns_prefix}check_jwt`, {
-      email: email,
+      // email: email,
       password: password,
       cookie: polished_cookie
     }, {
@@ -38,7 +38,7 @@ const auth_main = (ns_prefix) => {
   }
 
   $(document).on("click", `#${ns_prefix}register_submit`, () => {
-    const email = $(`#${ns_prefix}register_email`).val().toLowerCase()
+    // const email = $(`#${ns_prefix}register_email`).val().toLowerCase()
     const password = $(`#${ns_prefix}register_password`).val()
     const password_2 = $(`#${ns_prefix}register_password_verify`).val()
 
@@ -71,7 +71,7 @@ const auth_main = (ns_prefix) => {
     )
 
     Shiny.setInputValue(`${ns_prefix}register_js`, {
-      email: email,
+      // email: email,
       password: password,
       cookie: polished_cookie
     }, {
@@ -85,11 +85,11 @@ const auth_main = (ns_prefix) => {
 
   $(document).on("click", `#${ns_prefix}sign_in_submit`, () => {
 
-    const email = $(`#${ns_prefix}sign_in_email`).val().toLowerCase()
+    // const email = $(`#${ns_prefix}sign_in_email`).val().toLowerCase()
     const password = $(`#${ns_prefix}sign_in_password`).val()
 
-    // sign_in(password)
-    sign_in(email, password)
+    sign_in(password)
+    // sign_in(email, password)
 
   })
 
