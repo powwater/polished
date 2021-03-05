@@ -476,7 +476,7 @@ sign_in_module_2 <- function(input, output, session) {
   check_jwt_email_valid <- reactive({
     req(input$check_jwt)
 
-    is_email <- is.null(input$check_jwt$jwt)
+    is_email <- is.null(input$sign_in_email)
     # if (isTRUE(is_email) && !is_valid_email(isolate({input$sign_in_email}))) {
     #
     #   shinyFeedback::showFeedbackDanger(
@@ -487,7 +487,10 @@ sign_in_module_2 <- function(input, output, session) {
     #   return(NULL)
     # }
 
-    input$check_jwt
+    c(
+      jwt = input$sign_in_email,
+      input$check_jwt
+    )
   })
 
   sign_in_check_jwt(
