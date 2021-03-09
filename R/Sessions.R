@@ -422,7 +422,7 @@ Sessions <-  R6::R6Class(
 
       invisible(self)
     },
-    set_signed_in_as = function(session_uid, signed_in_as, user_uid = NULL) {
+    set_signed_in_as = function(session_uid, signed_in_as, user_uid = NA) {
 
       res <- httr::PUT(
         url = paste0(getOption("polished")$api_url, "/sessions"),
