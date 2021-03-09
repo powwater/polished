@@ -199,6 +199,7 @@ user_edit_module <- function(input, output, session,
           body = list(
             email = input_email,
             app_uid = getOption("polished")$app_uid,
+            user_uids = NA,
             is_admin = is_admin_out,
             req_user_uid = session$userData$user()$user_uid,
             send_invite_email = input$send_invite_email
