@@ -94,7 +94,7 @@ secure_static <- function(
 
 
   shiny::shinyApp(ui_out, server, onStart = function() {
-    library(polished)
+    library(powpolished)
 
     # configure the global sessions when the app initially starts up.
     do.call(

@@ -37,7 +37,6 @@ polished Sessions configuration function
   admin_mode = FALSE,
   is_invite_required = TRUE,
   sign_in_providers = "email",
-  is_email_verification_required = TRUE,
   is_auth_required = TRUE
 )}\if{html}{\out{</div>}}
 }
@@ -131,7 +130,7 @@ NULL if sign in fails. If sign in is successful, a list containing the following
 \if{latex}{\out{\hypertarget{method-set_signed_in_as}{}}}
 \subsection{Method \code{set_signed_in_as()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Sessions$set_signed_in_as(session_uid, signed_in_as, user_uid = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Sessions$set_signed_in_as(session_uid, signed_in_as, user_uid = NA)}\if{html}{\out{</div>}}
 }
 
 }
