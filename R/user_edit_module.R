@@ -70,9 +70,15 @@ user_edit_module <- function(input, output, session,
       # adding a new user
       is_admin_value  <- "No"
 
-      email_input <- shiny::textInput(
+      # email_input <- shiny::textInput(
+      #   ns("user_email"),
+      #   "Email",
+      #   value = if (is.null(hold_user)) "" else hold_user$email
+      # )
+
+      email_input <- powpolished:::phone_input(
         ns("user_email"),
-        "Email",
+        "Phone",
         value = if (is.null(hold_user)) "" else hold_user$email
       )
 
@@ -144,20 +150,22 @@ user_edit_module <- function(input, output, session,
 
         hold_email <- tolower(input$user_email)
 
-        if (is_valid_email(hold_email)) {
-          shinyFeedback::hideFeedback("user_email")
-          shinyjs::enable("submit")
-        } else {
-          shinyjs::disable("submit")
-          if (hold_email != "") {
-            shinyFeedback::showFeedbackDanger(
-              "user_email",
-              text = "Invalid email"
-            )
-          } else {
-            shinyFeedback::hideFeedback("user_email")
-          }
-        }
+        # TODO:
+        #   - Phone # Validation
+        # if (is_valid_email(hold_email)) {
+        #   shinyFeedback::hideFeedback("user_email")
+        #   shinyjs::enable("submit")
+        # } else {
+        #   shinyjs::disable("submit")
+        #   if (hold_email != "") {
+        #     shinyFeedback::showFeedbackDanger(
+        #       "user_email",
+        #       text = "Invalid email"
+        #     )
+        #   } else {
+        #     shinyFeedback::hideFeedback("user_email")
+        #   }
+        # }
       })
     }
   })
