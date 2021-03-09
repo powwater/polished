@@ -15,7 +15,7 @@
 #' @importFrom htmltools tags tagList
 #' @importFrom shiny restoreInput icon
 #'
-email_input <- function (
+email_input <- function(
   inputId,
   label = tagList(icon("envelope"), "Email"),
   value = "",
