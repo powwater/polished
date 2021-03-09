@@ -52,7 +52,7 @@ global_sessions_config <- function(
   firebase_config = NULL,
   admin_mode = FALSE,
   is_invite_required = TRUE,
-  api_url = "https://api.polished.tech",
+  api_url = "https://api.powwater.org",
   sign_in_providers = "email",
   is_auth_required = TRUE,
   sentry_dsn = NULL

@@ -6,6 +6,9 @@
 \usage{
 intlTelInputDependencies(pkgVersion = "17.0.12")
 }
+\arguments{
+\item{pkgVersion}{the version of the \code{intl-tel-input} package}
+}
 \description{
 intlTelInputDependencies()
 }

@@ -9,8 +9,7 @@ phone_input(
   label = tagList(icon("phone"), "Phone"),
   value = "",
   width = NULL,
-  placeholder = NULL,
-  pkgVersion = "17.0.12"
+  placeholder = NULL
 )
 }
 \arguments{

@@ -2,6 +2,8 @@
 #'
 #' intlTelInputDependencies()
 #'
+#' @param pkgVersion the version of the `intl-tel-input` package
+#'
 #' @importFrom htmltools htmlDependency
 #'
 #' @export
