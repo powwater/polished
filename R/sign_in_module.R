@@ -353,7 +353,7 @@ sign_in_module <- function(input, output, session) {
 
 
           # user is not registered (they are accidentally attempting to sign in before
-          # they have registed), so send them to the registration page and auto populate
+          # they have registered), so send them to the registration page and auto populate
           # the registration email input
           go_to_registration_page()
 
