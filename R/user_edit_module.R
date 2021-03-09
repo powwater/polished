@@ -76,7 +76,7 @@ user_edit_module <- function(input, output, session,
       #   value = if (is.null(hold_user)) "" else hold_user$email
       # )
 
-      email_input <- powpolished:::phone_input(
+      email_input <- powpolished::phone_input(
         ns("user_email"),
         "Phone",
         value = if (is.null(hold_user)) "" else hold_user$email

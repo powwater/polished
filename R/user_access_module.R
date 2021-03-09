@@ -23,6 +23,7 @@ user_access_module_ui <- function(id) {
           }"
         )
       ),
+      intlTelInputDependencies(),
       shinydashboard::box(
         width = 12,
         title = "Users",
