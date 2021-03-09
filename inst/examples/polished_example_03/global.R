@@ -1,5 +1,5 @@
 library(shiny)
-library(polished)
+library(powpolished)
 library(config)
 library(shinyjs)
 
