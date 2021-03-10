@@ -27,6 +27,11 @@ phone_input <- function(
 
   tagList(
     intlTelInputDependencies(),
+    tags$style(
+      ".iti {
+        width: 100%;
+      }"
+    ),
     div(
       class = "form-group shiny-input-container",
       style = if (!is.null(width)) paste0("width: ", width, ";"),
