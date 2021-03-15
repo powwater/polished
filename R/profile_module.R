@@ -21,25 +21,29 @@ profile_module_ui <- function(id, other_lis = NULL) {
       href="#",
       class = "dropdown-toggle",
       `data-toggle` = "dropdown",
-      htmltools::tags$i(
-        class = "fa fa-user"
-      )
-    ),
-    htmltools::tags$ul(
-      class = "dropdown-menu",
-      htmltools::tags$li(
-        shiny::textOutput(ns("auth_user")),
-        style='padding: 3px 20px;'
+      htmltools::div(
+        htmltools::tags$i(
+          class = "fa fa-user"
+        ),
+        "Profile",
+        style = "display: inline"
       ),
-      # Other links that can be used to link anything.  Often used to take the
-      # user to their "Account" app/page.
-      other_lis,
+      htmltools::tags$ul(
+        class = "dropdown-menu",
+        htmltools::tags$li(
+          shiny::textOutput(ns("auth_user")),
+          style='padding: 3px 20px;'
+        ),
+        # Other links that can be used to link anything.  Often used to take the
+        # user to their "Account" app/page.
+        other_lis,
 
-      htmltools::tags$li(
-        shiny::actionLink(
-          ns("polish__sign_out"),
-          label = "Sign Out",
-          icon = icon("sign-out")
+        htmltools::tags$li(
+          shiny::actionLink(
+            ns("polish__sign_out"),
+            label = "Sign Out",
+            icon = icon("sign-out")
+          )
         )
       )
     )
