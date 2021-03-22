@@ -57,18 +57,25 @@ sign_in_module_2_ui <- function(id) {
   )
 
   sign_in_email_ui <- tags$div(
-    id = ns("email_ui"),
+    id = ns("email_phone_ui"),
     tags$br(),
-    # email_input(
-    #   inputId = ns("sign_in_email"),
-    #   value = "",
-    #   width = "100%"
-    # ),
-    phone_input(
+    shiny::radioButtons(ns("choose_phone_email"),
+                        label = "Select Sign In Method:",
+                        choices = c("Phone", "Email"),
+                        selected = "Phone",
+                        inline = TRUE,
+                        width = "100%"),
+    tags$br(),
+    email_input(
       inputId = ns("sign_in_email"),
       value = "",
       width = "100%"
-    ),
+    ) %>% shinyjs::hidden(),
+    phone_input(
+      inputId = ns("sign_in_phone"),
+      value = "",
+      width = "100%"
+    ) %>% shinyjs::hidden(),
     tags$div(
       id = ns("sign_in_panel_bottom"),
       if (isTRUE(.global_sessions$is_invite_required)) {
@@ -143,14 +150,14 @@ sign_in_module_2_ui <- function(id) {
 
   register_ui <- div(
     br(),
-    # email_input(
-    #   inputId = ns("register_email"),
-    #   label = tagList(icon("envelope"), "email"),
-    #   value = "",
-    #   width = "100%"
-    # ),
-    phone_input(
+    email_input(
       inputId = ns("register_email"),
+      label = tagList(icon("envelope"), "email"),
+      value = "",
+      width = "100%"
+    ),
+    phone_input(
+      inputId = ns("register_phone"),
       value = "",
       width = "100%"
     ),
@@ -179,8 +186,8 @@ sign_in_module_2_ui <- function(id) {
     hold_providers_ui <- providers_ui(
       ns,
       providers[providers != "email"],
-      title = NULL,
-      fancy = FALSE
+      title = "Social Sign In",
+      fancy = TRUE
     )
 
     sign_in_ui <- tags$div(
@@ -193,9 +200,6 @@ sign_in_module_2_ui <- function(id) {
         ),
         column(
           5,
-          br(),
-          br(),
-          br(),
           br(),
           div(
             style = "margin-top: 8px;",
@@ -240,14 +244,24 @@ sign_in_module_2 <- function(input, output, session) {
   ns <- session$ns
 
   # Email Sign-In validation
-  # observeEvent(input$sign_in_email, {
-  #   shinyFeedback::hideFeedback("sign_in_email")
-  # })
+  observeEvent(input$sign_in_email, {
+    shinyFeedback::hideFeedback("sign_in_email")
+  })
 
   # Email Registration validation
-  # observeEvent(input$register_email, {
-  #   shinyFeedback::hideFeedback("register_email")
-  # })
+  observeEvent(input$register_email, {
+    shinyFeedback::hideFeedback("register_email")
+  })
+
+  obserEvent(input$choose_phone_email, {
+    if (input$choose_phone_email == "Phone") {
+      shinyjs::show("sign_in_phone")
+      shinyjs::hide("sign_in_email")
+    } else {
+      shinyjs::show("sign_in_email")
+      shinyjs::hide("sign_in_phone")
+    }
+  })
 
   observeEvent(input$sign_in_with_email, {
     shinyjs::show("email_ui")
@@ -276,17 +290,17 @@ sign_in_module_2 <- function(input, output, session) {
 
   shiny::observeEvent(input$submit_continue_sign_in, {
 
-    # email <- tolower(input$sign_in_email)
+    email <- tolower(input$sign_in_email)
 
     email <- input$sign_in_email
 
-    # if (!is_valid_email(email)) {
-    #   shinyFeedback::showFeedbackDanger(
-    #     "sign_in_email",
-    #     text = "Invalid email"
-    #   )
-    #   return()
-    # }
+    if (!is_valid_email(email)) {
+      shinyFeedback::showFeedbackDanger(
+        "sign_in_email",
+        text = "Invalid email"
+      )
+      return()
+    }
 
     # check user invite
     invite <- NULL
@@ -378,13 +392,13 @@ sign_in_module_2 <- function(input, output, session) {
 
     email <- input$register_email
 
-    # if (!is_valid_email(email)) {
-    #   shinyFeedback::showFeedbackDanger(
-    #     "register_email",
-    #     text = "Invalid email"
-    #   )
-    #   return()
-    # }
+    if (!is_valid_email(email)) {
+      shinyFeedback::showFeedbackDanger(
+        "register_email",
+        text = "Invalid email"
+      )
+      return()
+    }
 
     invite <- NULL
     tryCatch({
