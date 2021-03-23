@@ -91,7 +91,17 @@ sign_in_check_jwt <- function(jwt, session = shiny::getDefaultReactiveDomain()) 
             hashed_cookie = digest::digest(hold_jwt$cookie)
           )
 
-
+          # TODO:
+          #   - Password Reset w/ SMS verification (immediate)
+          # if (!is.null(new_user$message) && identical(new_user$message, "Password reset email sent")) {
+          #   shinyFeedback::resetLoadingButton('sign_in_submit')
+          #   shinyFeedback::showToast(
+          #     "info",
+          #     "Password reset required.  Check your email to reset your password.",
+          #     .options = polished_toast_options
+          #   )
+          #   return()
+          # }
         }
 
       } else {

@@ -408,6 +408,13 @@ Sessions <-  R6::R6Class(
         httr::content(res, "text", encoding = "UTF-8")
       )
 
+      # TODO:
+      #   - Password Reset w/ SMS verification (immediate)
+      # if (!identical(httr::status_code(res), 200L)) {
+      #   if (identical(session_out$message, "Password reset required")) {
+      #
+      #   }
+      # }
 
       session_out
     },
