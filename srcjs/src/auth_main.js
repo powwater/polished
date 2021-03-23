@@ -1,14 +1,6 @@
 
 const auth_main = (ns_prefix) => {
 
-  // Intl Telephone Input options
-  // var phone_input = document.querySelector(".intl-tel-input");
-
-  // window.intlTelInput(phone_input, {
-  //   utilsScript: "polish/intlTelInput/js/utils.js"
-  // });
-
-
   let cookie_options = {expires: 365} // set cookie to expire in 1 year
   if (location.protocol === 'https:') {
     // add cookie options that browsers are starting to require to allow you to
@@ -17,8 +9,7 @@ const auth_main = (ns_prefix) => {
     cookie_options.secure = true
   }
 
-  // const sign_in = (email, password) => {
-  const sign_in = (password) => {
+  const sign_in = (email, phone, password) => {
 
     const polished_cookie = "p" + Math.random()
 
@@ -29,7 +20,8 @@ const auth_main = (ns_prefix) => {
     )
 
     Shiny.setInputValue(`${ns_prefix}check_jwt`, {
-      // email: email,
+      email: email,
+      phone: phone,
       password: password,
       cookie: polished_cookie
     }, {
@@ -38,7 +30,8 @@ const auth_main = (ns_prefix) => {
   }
 
   $(document).on("click", `#${ns_prefix}register_submit`, () => {
-    // const email = $(`#${ns_prefix}register_email`).val().toLowerCase()
+    const email = $(`#${ns_prefix}register_email`).val().toLowerCase()
+    const phone = $(`#${ns_prefix}register_phone`)[0].dataset.full_phone_number;
     const password = $(`#${ns_prefix}register_password`).val()
     const password_2 = $(`#${ns_prefix}register_password_verify`).val()
 
@@ -71,7 +64,8 @@ const auth_main = (ns_prefix) => {
     )
 
     Shiny.setInputValue(`${ns_prefix}register_js`, {
-      // email: email,
+      email: email,
+      phone: phone,
       password: password,
       cookie: polished_cookie
     }, {
@@ -85,11 +79,11 @@ const auth_main = (ns_prefix) => {
 
   $(document).on("click", `#${ns_prefix}sign_in_submit`, () => {
 
-    // const email = $(`#${ns_prefix}sign_in_email`).val().toLowerCase()
+    const email = $(`#${ns_prefix}sign_in_email`).val().toLowerCase()
+    const phone = $(`#${ns_prefix}sign_in_phone`)[0].dataset.full_phone_number;
     const password = $(`#${ns_prefix}sign_in_password`).val()
 
-    sign_in(password)
-    // sign_in(email, password)
+    sign_in(email, phone, password)
 
   })
 

@@ -27,6 +27,34 @@ api_get_invite_by_email <- function(url, api_key, email, app_uid) {
   invite
 }
 
+api_get_invite_by_phone <- function(url, api_key, phone, app_uid) {
+
+
+  res <- httr::GET(
+    url = paste0(url, "/invite-by-phone"),
+    query = list(
+      phone = phone,
+      app_uid = app_uid
+    ),
+    httr::authenticate(
+      user = api_key,
+      password = ""
+    ),
+    config = list(http_version = 0)
+  )
+
+  invite <- jsonlite::fromJSON(
+    httr::content(res, "text", encoding = "UTF-8")
+  )
+
+  # API returns a length 0 list when there is no invite
+  if (length(invite) == 0) {
+    invite <- NULL
+  }
+
+  invite
+}
+
 api_get_invite <- function(url, api_key, app_uid, user_uid) {
   res <- httr::GET(
     url = paste0(url, "/invites"),
@@ -244,6 +272,19 @@ Sessions <-  R6::R6Class(
 
       return(invite)
     },
+    get_invite_by_phone = function(phone) {
+
+      invite <- NULL
+
+      invite <- api_get_invite_by_phone(
+        getOption("polished")$api_url,
+        getOption("polished")$api_key,
+        phone,
+        getOption("polished")$app_uid
+      )
+
+      return(invite)
+    },
     find = function(hashed_cookie, page) {
       if (nchar(hashed_cookie) == 0) return(NULL)
 
@@ -344,6 +385,32 @@ Sessions <-  R6::R6Class(
 
       session_out
     },
+    sign_in_phone = function(phone, password, hashed_cookie) {
+
+      res <- httr::POST(
+        url = paste0(getOption("polished")$api_url, "/sign-in-phone"),
+        body = list(
+          app_uid = getOption("polished")$app_uid,
+          phone = phone,
+          password = password,
+          hashed_cookie = hashed_cookie,
+          is_invite_required = self$is_invite_required
+        ),
+        encode = "json",
+        httr::authenticate(
+          user = getOption("polished")$api_key,
+          password = ""
+        ),
+        config = list(http_version = 0)
+      )
+
+      session_out <- jsonlite::fromJSON(
+        httr::content(res, "text", encoding = "UTF-8")
+      )
+
+
+      session_out
+    },
     register_email = function(email, password, hashed_cookie) {
 
       res <- httr::POST(
@@ -355,6 +422,35 @@ Sessions <-  R6::R6Class(
         body = list(
           app_uid = getOption("polished")$app_uid,
           email = email,
+          password = password,
+          hashed_cookie = hashed_cookie,
+          is_invite_required = self$is_invite_required
+        ),
+        encode = "json",
+        config = list(http_version = 0)
+      )
+
+      session_out <- jsonlite::fromJSON(
+        httr::content(res, "text", encoding = "UTF-8")
+      )
+
+      if (!identical(httr::status_code(res), 200L)) {
+        stop(session_out$message)
+      }
+
+      session_out
+    },
+    register_phone = function(phone, password, hashed_cookie) {
+
+      res <- httr::POST(
+        url = paste0(getOption("polished")$api_url, "/register-phone"),
+        httr::authenticate(
+          user = getOption("polished")$api_key,
+          password = ""
+        ),
+        body = list(
+          app_uid = getOption("polished")$app_uid,
+          phone = phone,
           password = password,
           hashed_cookie = hashed_cookie,
           is_invite_required = self$is_invite_required

@@ -66,21 +66,32 @@ sign_in_check_jwt <- function(jwt, session = shiny::getDefaultReactiveDomain()) 
 
       if (is.null(hold_jwt$jwt)) {
 
-        # attempt sign in with email
-        new_user <- .global_sessions$sign_in_email(
-          email = hold_jwt$email,
-          password = hold_jwt$password,
-          hashed_cookie = digest::digest(hold_jwt$cookie)
-        )
-
-        if (!is.null(new_user$message) && identical(new_user$message, "Password reset email sent")) {
-          shinyFeedback::resetLoadingButton('sign_in_submit')
-          shinyFeedback::showToast(
-            "info",
-            "Password reset required.  Check your email to reset your password.",
-            .options = polished_toast_options
+        if (hold_jwt$email != "") {
+          # attempt sign in with email
+          new_user <- .global_sessions$sign_in_email(
+            email = hold_jwt$email,
+            password = hold_jwt$password,
+            hashed_cookie = digest::digest(hold_jwt$cookie)
           )
-          return()
+
+          if (!is.null(new_user$message) && identical(new_user$message, "Password reset email sent")) {
+            shinyFeedback::resetLoadingButton('sign_in_submit')
+            shinyFeedback::showToast(
+              "info",
+              "Password reset required.  Check your email to reset your password.",
+              .options = polished_toast_options
+            )
+            return()
+          }
+        } else if (hold_jwt$phone != "") {
+          # attempt sign in with phone
+          new_user <- .global_sessions$sign_in_phone(
+            phone = hold_jwt$phone,
+            password = hold_jwt$password,
+            hashed_cookie = digest::digest(hold_jwt$cookie)
+          )
+
+
         }
 
       } else {
