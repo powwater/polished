@@ -165,3 +165,50 @@ is_email_registered <- function(email) {
 
   out
 }
+
+#' is_phone_registered
+#'
+#' Check if an phone address is already registered.  This function is used in our
+#' sign in modules to redirect the user from the sign in inputs to the registration
+#' inputs if the user is attempting to sign in before they have registered.
+#'
+#' @param phone the phone address to check
+#'
+#' @return boolean - whether of not the phone is already registered with the polished
+#' account
+#'
+#' @noRd
+#'
+is_phone_registered <- function(phone) {
+
+  user_res <- httr::GET(
+    paste0(getOption("polished")$api_url, "/users"),
+    query = list(
+      phone = phone
+    ),
+    httr::authenticate(
+      user = getOption("polished")$api_key,
+      password = ""
+    ),
+    config = list(http_version = 0)
+  )
+
+  user_res_content <- jsonlite::fromJSON(
+    httr::content(user_res, "text", encoding = "UTF-8")
+  )
+
+  if (!identical(httr::status_code(user_res), 200L)) {
+    print(user_res_content)
+    stop("error checking user registration", .call = FALSE)
+  }
+
+  if (isFALSE(user_res_content$email_verified) && isFALSE(user_res_content$email_verified)) {
+    out <- FALSE
+  } else {
+    out <- TRUE
+  }
+
+
+  out
+}
+
