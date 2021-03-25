@@ -126,6 +126,15 @@ user_access_module <- function(input, output, session) {
           "phone" = character(0)
         )
       } else {
+
+        # Account for empty Email or Phone column
+        #   - Shouldn't happen after a while
+        if (is.null(app_users$phone)) {
+          app_users$phone <- NA_character_
+        } else if (is.null(app_users$email)) {
+          app_users$email <- NA_character_
+        }
+
         app_users <- app_users %>%
           mutate(created_at = as.POSIXct(.data$created_at))
       }
