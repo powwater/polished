@@ -69,12 +69,12 @@ profile_module <- function(input, output, session) {
   output$auth_user <- shiny::renderText({
     shiny::req(session$userData$user())
 
-    session$userData$user()$email
+    if (!is.na(session$userData$user()$email)) session$userData$user()$email else session$userData$user()$phone
   })
 
 
   shiny::observeEvent(input$polish__sign_out, {
-    shiny::req(session$userData$user()$email)
+    shiny::req(!is.na(session$userData$user()$email) || !is.na(session$userData$user()$phone))
 
     tryCatch({
 

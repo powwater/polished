@@ -80,7 +80,7 @@ const auth_firebase = (ns_prefix) => {
   // Phone Number (SMS) Registration ONLY
 
   // Turn off phone auth app verification (TESTING)
-  auth.settings.appVerificationDisabledForTesting = true;
+  // auth.settings.appVerificationDisabledForTesting = true;
 
 
   var phone_register_counter = 0;
@@ -89,31 +89,57 @@ const auth_firebase = (ns_prefix) => {
 
     var phoneNumber = $(`#${ns_prefix}register_phone`)[0].dataset.full_phone_number;
 
-    var appVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container');
+    // var appVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container');
+    var appVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+      'size': 'invisible',
+      'callback': (response) => {
 
-    $(document).on("click", `#${ns_prefix}submit_phone_code`, () => {
+        Shiny.setInputValue(`${ns_prefix}render_recaptcha`, phone_register_counter + 1, { event: "priority" });
+      },
+    });
 
-      var testVerificationCode = $(`#${ns_prefix}phone_code`).val();
+    // appVerifier.render();
+
+    // $(document).on("click", `#${ns_prefix}submit_phone_code`, () => {
+
+    //   var testVerificationCode = $(`#${ns_prefix}phone_code`).val();
 
       auth.signInWithPhoneNumber(phoneNumber, appVerifier)
         .then(function (confirmationResult) {
 
-        // confirmationResult can resolve with the fictional testVerificationCode above.
-          confirmationResult.confirm(testVerificationCode).then((result) => {
 
-            Shiny.setInputValue(`${ns_prefix}phone_register_verified`, phone_register_counter + 1, { event: "priority" })
+
+          $(document).on("click", `#${ns_prefix}submit_phone_code`, () => {
+
+
+
+            var testVerificationCode = $(`#${ns_prefix}phone_code`).val();
+
+            // confirmationResult can resolve with the fictional testVerificationCode above.
+            confirmationResult.confirm(testVerificationCode).then((result) => {
+
+              Shiny.setInputValue(`${ns_prefix}phone_register_verified`, phone_register_counter + 1, { event: "priority" })
+            })
           })
+
+
         }).catch(function (error) {
           // Error; SMS not sent
           // ...
 
+
+
+
           // Reset the reCAPTCHA (w/o widget ID stored)
           appVerifier.render().then(function(widgetId) {
+
+
+
           // window.recaptchaVerifier.render().then(function(widgetId) {
             grecaptcha.reset(widgetId);
           });
         });
-    })
+    // })
 
   })
 

@@ -58,30 +58,41 @@ var auth_firebase = function auth_firebase(ns_prefix) {
     });
   }); // Phone Number (SMS) Registration ONLY
   // Turn off phone auth app verification (TESTING)
+  // auth.settings.appVerificationDisabledForTesting = true;
 
-  auth.settings.appVerificationDisabledForTesting = true;
   var phone_register_counter = 0;
   $(document).on("click", "#".concat(ns_prefix, "submit_continue_register_phone"), function () {
-    var phoneNumber = $("#".concat(ns_prefix, "register_phone"))[0].dataset.full_phone_number;
-    var appVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container');
-    $(document).on("click", "#".concat(ns_prefix, "submit_phone_code"), function () {
-      var testVerificationCode = $("#".concat(ns_prefix, "phone_code")).val();
-      auth.signInWithPhoneNumber(phoneNumber, appVerifier).then(function (confirmationResult) {
-        // confirmationResult can resolve with the fictional testVerificationCode above.
+    var phoneNumber = $("#".concat(ns_prefix, "register_phone"))[0].dataset.full_phone_number; // var appVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container');
+
+    var appVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+      'size': 'invisible',
+      'callback': function callback(response) {
+        Shiny.setInputValue("".concat(ns_prefix, "render_recaptcha"), phone_register_counter + 1, {
+          event: "priority"
+        });
+      }
+    }); // appVerifier.render();
+    // $(document).on("click", `#${ns_prefix}submit_phone_code`, () => {
+    //   var testVerificationCode = $(`#${ns_prefix}phone_code`).val();
+
+    auth.signInWithPhoneNumber(phoneNumber, appVerifier).then(function (confirmationResult) {
+      $(document).on("click", "#".concat(ns_prefix, "submit_phone_code"), function () {
+        var testVerificationCode = $("#".concat(ns_prefix, "phone_code")).val(); // confirmationResult can resolve with the fictional testVerificationCode above.
+
         confirmationResult.confirm(testVerificationCode).then(function (result) {
           Shiny.setInputValue("".concat(ns_prefix, "phone_register_verified"), phone_register_counter + 1, {
             event: "priority"
           });
         });
-      })["catch"](function (error) {
-        // Error; SMS not sent
-        // ...
-        // Reset the reCAPTCHA (w/o widget ID stored)
-        appVerifier.render().then(function (widgetId) {
-          // window.recaptchaVerifier.render().then(function(widgetId) {
-          grecaptcha.reset(widgetId);
-        });
       });
-    });
+    })["catch"](function (error) {
+      // Error; SMS not sent
+      // ...
+      // Reset the reCAPTCHA (w/o widget ID stored)
+      appVerifier.render().then(function (widgetId) {
+        // window.recaptchaVerifier.render().then(function(widgetId) {
+        grecaptcha.reset(widgetId);
+      });
+    }); // })
   });
 };

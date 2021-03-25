@@ -182,10 +182,8 @@ sign_in_module_2_ui <- function(id) {
       value = "",
       width = "100%"
     ),
-    # TODO:
-    #   - CONFIRM this works w/ modal
     tags$div(
-      id = 'recaptcha-container'
+      id = 'recaptcha-container',
     )
   ) %>% shinyjs::hidden()
 
@@ -202,9 +200,7 @@ sign_in_module_2_ui <- function(id) {
   sign_in_register_email <- shiny::tabsetPanel(
     id = ns("tabs"),
     shiny::tabPanel("Sign In", sign_in_ui_combined),
-    # shiny::tabPanel("Sign In", sign_in_email_ui, sign_in_phone_ui),
     shiny::tabPanel("Register", register_ui_combined)
-    # shiny::tabPanel("Register", register_ui_email, register_ui_phone)
   )
 
   providers <- .global_sessions$sign_in_providers
@@ -279,6 +275,9 @@ sign_in_module_2_ui <- function(id) {
 
   htmltools::tagList(
     shinyjs::useShinyjs(),
+    # tags$div(
+    #   id = 'recaptcha-container'
+    # ),
     sign_in_ui,
     tags$script(src = "polish/js/auth_keypress.js?version=2"),
     tags$script(paste0("auth_keypress('", ns(''), "')")),
@@ -494,7 +493,7 @@ sign_in_module_2 <- function(input, output, session) {
         return()
       } else {
 
-        if (is_phone_registered(phone)) {
+        if (isTRUE(invite$is_invite_accepted)) {
 
           # user is invited, so continue the sign in process
           shinyjs::hide("submit_continue_sign_in_phone")
@@ -643,25 +642,25 @@ sign_in_module_2 <- function(input, output, session) {
         return()
       }
 
-      shiny::showModal(
-        shiny::modalDialog(
-          shiny::textInput(
-            ns("phone_code"),
-            "SMS Verification Code",
-            placeholder = "555555"
-          ),
-          footer = list(
-            modalButton("Cancel"),
-            actionButton(
-              ns("submit_phone_code"),
-              "Submit"#,
-              # class = "btn-danger",
-              # style = "color: white",
-              # icon = icon("times")
-            )
-          )
-        )
-      )
+      # shiny::showModal(
+      #   shiny::modalDialog(
+      #     shiny::textInput(
+      #       ns("phone_code"),
+      #       "SMS Verification Code",
+      #       placeholder = "555555"
+      #     ),
+      #     footer = list(
+      #       modalButton("Cancel"),
+      #       actionButton(
+      #         ns("submit_phone_code"),
+      #         "Submit"#,
+      #         # class = "btn-danger",
+      #         # style = "color: white",
+      #         # icon = icon("times")
+      #       )
+      #     )
+      #   )
+      # )
 
     }, error = function(e) {
       # user is not invited
@@ -676,6 +675,52 @@ sign_in_module_2 <- function(input, output, session) {
     })
 
   }, ignoreInit = TRUE)
+
+  observeEvent(input$render_recaptcha, {
+
+    shiny::showModal(
+      shiny::modalDialog(
+        shiny::textInput(
+          ns("phone_code"),
+          "SMS Verification Code",
+          placeholder = "555555"
+        ),
+        footer = list(
+          modalButton("Cancel"),
+          actionButton(
+            ns("submit_phone_code"),
+            "Submit"#,
+            # class = "btn-danger",
+            # style = "color: white",
+            # icon = icon("times")
+          )
+        ),
+        size = "s"
+      )
+    )
+
+    observeEvent(input$phone_code, {
+
+      hold_phone_code <- input$phone_code
+
+      if (nchar(hold_phone_code) == 6) {
+        shinyFeedback::hideFeedback("phone_code")
+        shinyjs::enable("submit_phone_code")
+      } else {
+        if (hold_phone_code != "") {
+          shinyjs::disable("submit_phone_code")
+          shinyFeedback::showFeedbackDanger(
+            "phone_code",
+            text = "Code Contains 6 Digits"
+          )
+        } else {
+          shinyFeedback::hideFeedback("phone_code")
+        }
+      }
+
+    })
+
+  })
 
   observeEvent(input$phone_register_verified, {
     shiny::removeModal()
