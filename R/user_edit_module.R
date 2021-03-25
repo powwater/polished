@@ -142,11 +142,22 @@ user_edit_module <- function(input, output, session,
       )
     )
 
-    if (!is.null(email_input)) {
+    if (!is.null(email_input) && !is.null(phone_input)) {
 
-      observeEvent(input$user_email, {
+      observeEvent(
+        list(
+          input$user_email,
+          input$user_phone
+        ), {
 
         hold_email <- tolower(input$user_email)
+        hold_phone <- input$user_phone
+
+        if (hold_email == "" && (is.null(hold_phone) || hold_phone == "")) {
+          shinyjs::disable("submit")
+        } else {
+          shinyjs::enable("submit")
+        }
 
         if (is_valid_email(hold_email)) {
           shinyFeedback::hideFeedback("user_email")
@@ -163,16 +174,16 @@ user_edit_module <- function(input, output, session,
             shinyFeedback::hideFeedback("user_email")
           }
         }
-      })
+      }, ignoreInit = TRUE)
+
+
+      # observeEvent(input$user_phone, {
+      #   hold_phone <- input$user_phone
+      #
+      #   # TODO:
+      #   #   - Phone # Validation
+      # })
     }
-
-    observeEvent(input$user_phone, {
-      hold_phone <- input$user_phone
-
-      # TODO:
-      #   - Phone # Validation
-    })
-
 
   })
 
