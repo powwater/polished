@@ -168,7 +168,7 @@ sign_in_module_2_ui <- function(id) {
     br(),
     email_input(
       inputId = ns("register_email"),
-      label = tagList(icon("envelope"), "email"),
+      label = tagList(icon("envelope"), "Email"),
       value = "",
       width = "100%"
     )
@@ -211,6 +211,9 @@ sign_in_module_2_ui <- function(id) {
       sign_in_register_email
     )
   } else if (all(c('email', 'phone') %in% providers)) {
+
+    providers <- c("email", "phone", providers[!(providers %in% c("email", "phone"))])
+
     hold_providers_ui <- providers_ui(
       ns,
       providers,
@@ -275,9 +278,6 @@ sign_in_module_2_ui <- function(id) {
 
   htmltools::tagList(
     shinyjs::useShinyjs(),
-    # tags$div(
-    #   id = 'recaptcha-container'
-    # ),
     sign_in_ui,
     tags$script(src = "polish/js/auth_keypress.js?version=2"),
     tags$script(paste0("auth_keypress('", ns(''), "')")),
@@ -309,6 +309,14 @@ sign_in_module_2 <- function(input, output, session) {
 
   # Change between Email & Phone UI (button, inputs, etc.)
   observeEvent(input$sign_in_with_phone, {
+
+    # Remove potential text from hidden Email Input
+    shiny::updateTextInput(
+      session,
+      "sign_in_email",
+      value = ""
+    )
+
     shinyjs::hide("email_ui")
     shinyjs::hide("register_email_ui")
     shinyjs::hide("submit_continue_sign_in")
@@ -322,6 +330,14 @@ sign_in_module_2 <- function(input, output, session) {
   })
 
   observeEvent(input$sign_in_with_email, {
+
+    # Remove potential text from hidden Email Input
+    shiny::updateTextInput(
+      session,
+      "sign_in_phone",
+      value = ""
+    )
+
     shinyjs::hide("phone_ui")
     shinyjs::hide("register_phone_ui")
     shinyjs::hide("submit_continue_sign_in_phone")
@@ -641,26 +657,6 @@ sign_in_module_2 <- function(input, output, session) {
         )
         return()
       }
-
-      # shiny::showModal(
-      #   shiny::modalDialog(
-      #     shiny::textInput(
-      #       ns("phone_code"),
-      #       "SMS Verification Code",
-      #       placeholder = "555555"
-      #     ),
-      #     footer = list(
-      #       modalButton("Cancel"),
-      #       actionButton(
-      #         ns("submit_phone_code"),
-      #         "Submit"#,
-      #         # class = "btn-danger",
-      #         # style = "color: white",
-      #         # icon = icon("times")
-      #       )
-      #     )
-      #   )
-      # )
 
     }, error = function(e) {
       # user is not invited

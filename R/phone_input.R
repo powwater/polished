@@ -48,7 +48,8 @@ phone_input <- function(
       class = "form-control",
       # class = "form-control custom-phone-input",
       value = value,
-      placeholder = placeholder
+      placeholder = placeholder,
+      autocomplete = "tel-national"
     ),
     tags$script(paste0(
       '

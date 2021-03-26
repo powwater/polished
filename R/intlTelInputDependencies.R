@@ -29,7 +29,7 @@ intlTelInputDependencies <- function(pkgVersion = "17.0.12") {
         crossorigin = "anonymous"
       )
     ),
-    stylesheet = c("css/intlTelInput.css", "img/flags.png")
+    stylesheet = c("css/intlTelInput.css")
   )
 }
 
