@@ -195,11 +195,9 @@ user_edit_module <- function(input, output, session,
   # the firebase function to add the user is triggered in the client side js, not in Shiny
   shiny::observeEvent(input$submit, {
     session_user <- session$userData$user()$user_uid
-    # TODO:
-    #   FOR PLUMBER, send `NULL` to use default `NA` in endpoints
 
-    input_email <- if (length(input$user_email) == 0) NULL else tolower(input$user_email)
-    input_phone <- if (length(input$user_phone) == 0) NULL else input$user_phone
+    input_email <- if (input$user_email == "") NULL else tolower(input$user_email)
+    input_phone <- if (input$user_phone == "") NULL else input$user_phone
     input_is_admin <- input$user_is_admin
 
     is_admin_out <- if (input_is_admin == "Yes") TRUE else FALSE
