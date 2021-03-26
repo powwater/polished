@@ -119,8 +119,7 @@ providers_ui <- function(ns, sign_in_providers = c(
           "Sign in with Phone",
           icon = icon("phone"),
           width = "100%",
-          class = "btn-lg",
-          style = "background-color: #e4e4e4; color: #FFF; margin: 10px 0;"
+          style = "background-color: #e4e4e4; margin-bottom: 10px;"
         ),
         "google" = actionButton(
           ns("sign_in_with_google"),
@@ -158,8 +157,7 @@ providers_ui <- function(ns, sign_in_providers = c(
           "Sign in with Phone",
           icon = icon("phone"),
           width = "100%",
-          class = "btn-lg",
-          style = "background-color: #e4e4e4; color: #FFF; margin: 10px 0;"
+          style = "background-color: #e4e4e4; margin-bottom: 10px;"
         ),
         "google" = actionButton(
           ns("sign_in_with_google"),
