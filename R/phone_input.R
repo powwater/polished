@@ -25,32 +25,31 @@ phone_input <- function(
 {
   value <- restoreInput(id = inputId, default = value)
 
-  tagList(
+  tags$div(
     intlTelInputDependencies(),
     tags$style(
       ".iti {
-        width: 100%;
-      }"
+           width: 100%;
+         }"
     ),
-    div(
-      class = "form-group shiny-input-container",
-      style = if (!is.null(width)) paste0("width: ", width, ";"),
-      # style = htmltools::css(width = validateCssUnit(width)),
-      # shiny:::shinyInputLabel(inputId, label),
-      tags$label(
-        label,
-        class = "control-label",
-        class = if (is.null(label)) "shiny-label-null",
-        `for` = inputId
-      ),
-      tags$input(
-        id = inputId,
-        type = "tel",
-        class = "form-control",
-        # class = "form-control custom-phone-input",
-        value = value,
-        placeholder = placeholder
-      )
+    class = "form-group shiny-input-container",
+    style = if (!is.null(width)) paste0("width: ", width, ";"),
+    # style = htmltools::css(width = validateCssUnit(width)),
+    # shiny:::shinyInputLabel(inputId, label),
+    tags$label(
+      label,
+      class = "control-label",
+      class = if (is.null(label)) "shiny-label-null",
+      `for` = inputId
+    ),
+    tags$input(
+      id = inputId,
+      type = "tel",
+      class = "form-control",
+      # class = "form-control custom-phone-input",
+      value = value,
+      placeholder = placeholder,
+      autocomplete = "tel-national"
     ),
     tags$script(paste0(
       '
@@ -80,7 +79,7 @@ phone_input <- function(
         });
 
         telInput.addEventListener("keyup", formatIntlTelInput);
-        telInput.addEventListener("change", setShinyInputValue);
+        telInput.addEventListener("change", setInputValue);
         telInput.addEventListener("change", formatIntlTelInput);
 
         function formatIntlTelInput() {
@@ -92,8 +91,11 @@ phone_input <- function(
             }
         }
 
-        function setShinyInputValue() {
+        function setInputValue() {
+          // Set the Shiny input value
           Shiny.setInputValue("', inputId, '", iti.getNumber(), { priority: "event" });
+          // Add the full Phone # to the Javascript object
+          telInput.dataset.full_phone_number = iti.getNumber();
         }
 
       }

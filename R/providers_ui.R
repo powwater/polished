@@ -22,72 +22,175 @@ providers_ui <- function(ns, sign_in_providers = c(
   "email"
 ), title = "Sign In", fancy = TRUE) {
 
-  if(isTRUE(fancy)) {
-    providers_buttons <- list(
-      "google" = actionButton(
-        ns("sign_in_with_google"),
-        "Sign in with Google",
-        icon = icon("google"),
-        width = "100%",
-        class = "btn-lg",
-        style = "background-color: #4285F4; color: #FFF; margin: 10px 0;"
-      ),
-      "microsoft" = actionButton(
-        ns("sign_in_with_microsoft"),
-        "Sign in with Microsoft",
-        icon = icon("microsoft"),
-        width = "100%",
-        class = "btn-lg",
-        style = "background-color: #7FBA00; color: #FFF; margin: 10px 0;"
-      ),
-      "facebook" = actionButton(
-        ns("sign_in_with_facebook"),
-        "Sign in with Facebook",
-        icon = icon("facebook"),
-        width = "100%",
-        class = "btn-lg",
-        style = "background-color: #3B5998; color: #FFF; margin: 10px 0;"
-      ),
-      "email" = actionButton(
-        ns("sign_in_with_email"),
-        "Sign in with Email",
-        icon = icon("envelope"),
-        width = "100%",
-        class = "btn-lg",
-        style = "background-color: #DB4437; color: #FFF; margin: 10px 0;"
+  if (isTRUE(fancy)) {
+    if (all(c("email", "phone") %in% sign_in_providers)) {
+      providers_buttons <- list(
+        "phone" = actionButton(
+          ns("sign_in_with_phone"),
+          "Sign in with Phone",
+          icon = icon("phone"),
+          width = "100%",
+          class = "btn-lg",
+          style = "background-color: #4285F4; color: #FFF; margin: 10px 0;"
+        ),
+        "google" = actionButton(
+          ns("sign_in_with_google"),
+          "Sign in with Google",
+          icon = icon("google"),
+          width = "100%",
+          class = "btn-lg",
+          style = "background-color: #4285F4; color: #FFF; margin: 10px 0;"
+        ),
+        "microsoft" = actionButton(
+          ns("sign_in_with_microsoft"),
+          "Sign in with Microsoft",
+          icon = icon("microsoft"),
+          width = "100%",
+          class = "btn-lg",
+          style = "background-color: #7FBA00; color: #FFF; margin: 10px 0;"
+        ),
+        "facebook" = actionButton(
+          ns("sign_in_with_facebook"),
+          "Sign in with Facebook",
+          icon = icon("facebook"),
+          width = "100%",
+          class = "btn-lg",
+          style = "background-color: #3B5998; color: #FFF; margin: 10px 0;"
+        ),
+        "email" = actionButton(
+          ns("sign_in_with_email"),
+          "Sign in with Email",
+          icon = icon("envelope"),
+          width = "100%",
+          class = "btn-lg",
+          style = "background-color: #DB4437; color: #FFF; margin: 10px 0;"
+        ) %>% shinyjs::hidden()
       )
-    )
+    } else {
+      providers_buttons <- list(
+        "phone" = actionButton(
+          ns("sign_in_with_phone"),
+          "Sign in with Phone",
+          icon = icon("phone"),
+          width = "100%",
+          class = "btn-lg",
+          style = "background-color: #4285F4; color: #FFF; margin: 10px 0;"
+        ),
+        "google" = actionButton(
+          ns("sign_in_with_google"),
+          "Sign in with Google",
+          icon = icon("google"),
+          width = "100%",
+          class = "btn-lg",
+          style = "background-color: #4285F4; color: #FFF; margin: 10px 0;"
+        ),
+        "microsoft" = actionButton(
+          ns("sign_in_with_microsoft"),
+          "Sign in with Microsoft",
+          icon = icon("microsoft"),
+          width = "100%",
+          class = "btn-lg",
+          style = "background-color: #7FBA00; color: #FFF; margin: 10px 0;"
+        ),
+        "facebook" = actionButton(
+          ns("sign_in_with_facebook"),
+          "Sign in with Facebook",
+          icon = icon("facebook"),
+          width = "100%",
+          class = "btn-lg",
+          style = "background-color: #3B5998; color: #FFF; margin: 10px 0;"
+        ),
+        "email" = actionButton(
+          ns("sign_in_with_email"),
+          "Sign in with Email",
+          icon = icon("envelope"),
+          width = "100%",
+          class = "btn-lg",
+          style = "background-color: #DB4437; color: #FFF; margin: 10px 0;"
+        )
+      )
+    }
   } else {
-    providers_buttons <- list(
-      "google" = actionButton(
-        ns("sign_in_with_google"),
-        "Sign in with Google",
-        icon = icon("google"),
-        width = "100%",
-        style = "background-color: #e4e4e4; margin-bottom: 10px;"
-      ),
-      "microsoft" = actionButton(
-        ns("sign_in_with_microsoft"),
-        "Sign in with Microsoft",
-        icon = icon("microsoft"),
-        width = "100%",
-        style = "background-color: #e4e4e4; margin-bottom: 10px;"
-      ),
-      "facebook" = actionButton(
-        ns("sign_in_with_facebook"),
-        "Sign in with Facebook",
-        icon = icon("facebook"),
-        width = "100%",
-        style = "background-color: #e4e4e4; margin-bottom: 10px;"
-      ),
-      "email" = actionButton(
-        ns("sign_in_with_email"),
-        "Sign in with Email",
-        icon = icon("envelope"),
-        width = "100%",
-        style = "background-color: #e4e4e4; margin-bottom: 10px;"
+
+    if (all(c("email", "phone") %in% sign_in_providers)) {
+      providers_buttons <- list(
+        "phone" = actionButton(
+          ns("sign_in_with_phone"),
+          "Sign in with Phone",
+          icon = icon("phone"),
+          width = "100%",
+          style = "background-color: #e4e4e4; margin-bottom: 10px;"
+        ),
+        "google" = actionButton(
+          ns("sign_in_with_google"),
+          "Sign in with Google",
+          icon = icon("google"),
+          width = "100%",
+          style = "background-color: #e4e4e4; margin-bottom: 10px;"
+        ),
+        "microsoft" = actionButton(
+          ns("sign_in_with_microsoft"),
+          "Sign in with Microsoft",
+          icon = icon("microsoft"),
+          width = "100%",
+          style = "background-color: #e4e4e4; margin-bottom: 10px;"
+        ),
+        "facebook" = actionButton(
+          ns("sign_in_with_facebook"),
+          "Sign in with Facebook",
+          icon = icon("facebook"),
+          width = "100%",
+          style = "background-color: #e4e4e4; margin-bottom: 10px;"
+        ),
+        "email" = actionButton(
+          ns("sign_in_with_email"),
+          "Sign in with Email",
+          icon = icon("envelope"),
+          width = "100%",
+          style = "background-color: #e4e4e4; margin-bottom: 10px;"
+        ) %>% shinyjs::hidden()
       )
-    )
+    } else {
+      providers_buttons <- list(
+        "phone" = actionButton(
+          ns("sign_in_with_phone"),
+          "Sign in with Phone",
+          icon = icon("phone"),
+          width = "100%",
+          style = "background-color: #e4e4e4; margin-bottom: 10px;"
+        ),
+        "google" = actionButton(
+          ns("sign_in_with_google"),
+          "Sign in with Google",
+          icon = icon("google"),
+          width = "100%",
+          style = "background-color: #e4e4e4; margin-bottom: 10px;"
+        ),
+        "microsoft" = actionButton(
+          ns("sign_in_with_microsoft"),
+          "Sign in with Microsoft",
+          icon = icon("microsoft"),
+          width = "100%",
+          style = "background-color: #e4e4e4; margin-bottom: 10px;"
+        ),
+        "facebook" = actionButton(
+          ns("sign_in_with_facebook"),
+          "Sign in with Facebook",
+          icon = icon("facebook"),
+          width = "100%",
+          style = "background-color: #e4e4e4; margin-bottom: 10px;"
+        ),
+        "email" = actionButton(
+          ns("sign_in_with_email"),
+          "Sign in with Email",
+          icon = icon("envelope"),
+          width = "100%",
+          style = "background-color: #e4e4e4; margin-bottom: 10px;"
+        )
+      )
+    }
+
+
   }
 
 

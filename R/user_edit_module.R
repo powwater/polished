@@ -70,14 +70,14 @@ user_edit_module <- function(input, output, session,
       # adding a new user
       is_admin_value  <- "No"
 
-      # email_input <- shiny::textInput(
-      #   ns("user_email"),
-      #   "Email",
-      #   value = if (is.null(hold_user)) "" else hold_user$email
-      # )
-
-      email_input <- powpolished::phone_input(
+      email_input <- shiny::textInput(
         ns("user_email"),
+        "Email",
+        value = if (is.null(hold_user)) "" else hold_user$email
+      )
+
+      phone_input <- powpolished::phone_input(
+        ns("user_phone"),
         "Phone",
         value = if (is.null(hold_user)) "" else hold_user$email
       )
@@ -89,7 +89,7 @@ user_edit_module <- function(input, output, session,
 
 
     } else {
-      # editing and existing user
+      # editing an existing user
 
       if (isTRUE(hold_user$is_admin)) {
         is_admin_value <- "Yes"
@@ -98,13 +98,10 @@ user_edit_module <- function(input, output, session,
       }
 
       email_input <- NULL
+      phone_input <- NULL
 
       send_invite_ui <- list()
     }
-
-
-
-
 
     shiny::showModal(
       shiny::modalDialog(
@@ -124,6 +121,7 @@ user_edit_module <- function(input, output, session,
         # modal content
         htmltools::br(),
         email_input,
+        phone_input,
         htmltools::br(),
         htmltools::div(
           class = "text-center",
@@ -144,30 +142,49 @@ user_edit_module <- function(input, output, session,
       )
     )
 
-    if (!is.null(email_input)) {
+    if (!is.null(email_input) && !is.null(phone_input)) {
 
-      observeEvent(input$user_email, {
+      observeEvent(
+        list(
+          input$user_email,
+          input$user_phone
+        ), {
 
         hold_email <- tolower(input$user_email)
+        hold_phone <- input$user_phone
 
-        # TODO:
-        #   - Phone # Validation
-        # if (is_valid_email(hold_email)) {
-        #   shinyFeedback::hideFeedback("user_email")
-        #   shinyjs::enable("submit")
-        # } else {
-        #   shinyjs::disable("submit")
-        #   if (hold_email != "") {
-        #     shinyFeedback::showFeedbackDanger(
-        #       "user_email",
-        #       text = "Invalid email"
-        #     )
-        #   } else {
-        #     shinyFeedback::hideFeedback("user_email")
-        #   }
-        # }
-      })
+        if (hold_email == "" && (is.null(hold_phone) || hold_phone == "")) {
+          shinyjs::disable("submit")
+        } else {
+          shinyjs::enable("submit")
+        }
+
+        if (is_valid_email(hold_email)) {
+          shinyFeedback::hideFeedback("user_email")
+          shinyjs::enable("submit")
+        } else {
+          # shinyjs::disable("submit")
+          if (hold_email != "") {
+            shinyjs::disable("submit")
+            shinyFeedback::showFeedbackDanger(
+              "user_email",
+              text = "Invalid email"
+            )
+          } else {
+            shinyFeedback::hideFeedback("user_email")
+          }
+        }
+      }, ignoreInit = TRUE)
+
+
+      # observeEvent(input$user_phone, {
+      #   hold_phone <- input$user_phone
+      #
+      #   # TODO:
+      #   #   - Phone # Validation
+      # })
     }
+
   })
 
 
@@ -178,7 +195,9 @@ user_edit_module <- function(input, output, session,
   # the firebase function to add the user is triggered in the client side js, not in Shiny
   shiny::observeEvent(input$submit, {
     session_user <- session$userData$user()$user_uid
-    input_email <- tolower(input$user_email)
+
+    input_email <- if (input$user_email == "") NULL else tolower(input$user_email)
+    input_phone <- if (input$user_phone == "") NULL else input$user_phone
     input_is_admin <- input$user_is_admin
 
     is_admin_out <- if (input_is_admin == "Yes") TRUE else FALSE
@@ -198,8 +217,9 @@ user_edit_module <- function(input, output, session,
           url = paste0(getOption("polished")$api_url, "/app-users"),
           body = list(
             email = input_email,
+            phone = input_phone,
             app_uid = getOption("polished")$app_uid,
-            user_uids = NA,
+            user_uids = NULL,
             is_admin = is_admin_out,
             req_user_uid = session$userData$user()$user_uid,
             send_invite_email = input$send_invite_email

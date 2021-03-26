@@ -156,7 +156,7 @@ is_email_registered <- function(email) {
     stop("error checking user registration", .call = FALSE)
   }
 
-  if (isFALSE(user_res_content$email_verified) && isFALSE(user_res_content$email_verified)) {
+  if (isFALSE(user_res_content$email_verified)) {
     out <- FALSE
   } else {
     out <- TRUE
@@ -165,3 +165,4 @@ is_email_registered <- function(email) {
 
   out
 }
+

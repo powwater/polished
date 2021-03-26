@@ -115,7 +115,6 @@ user_access_module <- function(input, output, session) {
         httr::content(res, "text", encoding = "UTF-8")
       )
 
-
       if (length(app_users) == 0) {
         app_users <- tibble::tibble(
           "uid" = character(0),
@@ -123,9 +122,19 @@ user_access_module <- function(input, output, session) {
           "user_uid" = character(0),
           "is_admin" = logical(0),
           "created_at" = as.POSIXct(character(0)),
-          "email" = character(0)
+          "email" = character(0),
+          "phone" = character(0)
         )
       } else {
+
+        # Account for empty Email or Phone column
+        #   - Shouldn't happen after a while
+        if (is.null(app_users$phone)) {
+          app_users$phone <- NA_character_
+        } else if (is.null(app_users$email)) {
+          app_users$email <- NA_character_
+        }
+
         app_users <- app_users %>%
           mutate(created_at = as.POSIXct(.data$created_at))
       }
@@ -223,7 +232,7 @@ user_access_module <- function(input, output, session) {
         dplyr::mutate(
           invite_status = ifelse(is.na(.data$last_sign_in_at), "Pending", "Accepted")
         ) %>%
-        dplyr::select(.data$actions, .data$email, .data$invite_status, .data$is_admin, .data$last_sign_in_at)
+        dplyr::select(.data$actions, .data$email, .data$phone, .data$invite_status, .data$is_admin, .data$last_sign_in_at)
     }
 
     if (is.null(users_table_prep())) {
@@ -245,6 +254,7 @@ user_access_module <- function(input, output, session) {
       colnames = c(
         "",
         "Email",
+        "Phone",
         "Invite Status",
         "Is Admin?",
         "Last Sign In"
@@ -260,7 +270,7 @@ user_access_module <- function(input, output, session) {
           list(targets = 0, width = "105px")
         ),
         order = list(
-          list(4, 'desc')
+          list(5, 'desc')
         ),
         # removes any lingering tooltips
         drawCallback = JS("function(settings) {
@@ -268,7 +278,7 @@ user_access_module <- function(input, output, session) {
         }")
       )
     ) %>%
-      DT::formatDate(5, method = "toLocaleString")
+      DT::formatDate(6, method = "toLocaleString")
   })
 
   users_proxy <- DT::dataTableProxy("users_table")
