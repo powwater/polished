@@ -205,7 +205,7 @@ user_edit_module <- function(input, output, session,
     # adding a new user
     if (is.null(hold_user)) {
       input_email <- if (input$user_email == "") NULL else tolower(input$user_email)
-      input_phone <- if (input$user_phone == "") NULL else input$user_phone
+      input_phone <- if (is.null(input$user_phone) || input$user_phone == "") NULL else input$user_phone
 
       tryCatch({
 
