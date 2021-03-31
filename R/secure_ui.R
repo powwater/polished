@@ -207,7 +207,7 @@ secure_ui <- function(
 
           # server the payments module UI
           if (is.null(account_module_ui)) {
-            stop("`account_module_ui`` cannot be NULL", call. = FALSE)
+            stop("`account_module_ui` cannot be NULL", call. = FALSE)
           } else {
             page_out <- tagList(
               account_module_ui,
