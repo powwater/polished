@@ -196,21 +196,17 @@ user_edit_module <- function(input, output, session,
   shiny::observeEvent(input$submit, {
     session_user <- session$userData$user()$user_uid
 
-    input_email <- if (input$user_email == "") NULL else tolower(input$user_email)
-    input_phone <- if (input$user_phone == "") NULL else input$user_phone
     input_is_admin <- input$user_is_admin
 
     is_admin_out <- if (input_is_admin == "Yes") TRUE else FALSE
 
-
     hold_user <- user_to_edit()
 
-    users_params <- list(
-      input_email
-    )
-
+    # adding a new user
     if (is.null(hold_user)) {
-      # adding a new user
+      input_email <- if (input$user_email == "") NULL else tolower(input$user_email)
+      input_phone <- if (input$user_phone == "") NULL else input$user_phone
+
       tryCatch({
 
         res <- httr::POST(

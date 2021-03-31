@@ -557,6 +557,7 @@ Sessions <-  R6::R6Class(
       )
 
       email <- invite$email
+      phone <- invite$phone
 
       res <- httr::GET(
         url = paste0(getOption("polished")$api_url, "/user-roles"),
@@ -587,6 +588,7 @@ Sessions <-  R6::R6Class(
       list(
         user_uid = user_uid,
         email = email,
+        phone = phone,
         is_admin = invite$is_admin,
         roles = roles_out
       )
