@@ -49,6 +49,7 @@ secure_server <- function(
           session_uid = uuid::UUIDgenerate(),
           user_uid = "00000000-0000-0000-0000-000000000000",
           email = "admin@tychobra.com",
+          phone = NA,
           is_admin = TRUE,
           hashed_cookie = character(0),
           email_verified = TRUE,
