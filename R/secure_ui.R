@@ -200,14 +200,15 @@ secure_ui <- function(
           tags$script(src = "polish/js/polished_session.js?version=2"),
           tags$script(paste0("polished_session('", user$hashed_cookie, "')"))
         )
-      } else if (isTRUE(user$email_verified) || (!is.na(user$phone) && !is.na(user$hashed_cookie))) {
+      } else if (isTRUE(user$email_verified) ||
+          isFALSE(.global_sessions$is_email_verification_required)) {
 
 
         if (identical(page_query, "account")) {
 
           # server the payments module UI
           if (is.null(account_module_ui)) {
-            stop("`account_module_ui` cannot be NULL", call. = FALSE)
+            stop("`account_module_ui`` cannot be NULL", call. = FALSE)
           } else {
             page_out <- tagList(
               account_module_ui,

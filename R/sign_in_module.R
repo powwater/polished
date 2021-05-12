@@ -127,13 +127,9 @@ sign_in_module_ui <- function(
         "Sign In"
       ),
       tags$br(),
-      # email_input(
-      #   inputId = ns("sign_in_email"),
-      #   label = tagList(icon("envelope"), "email"),
-      #   value = ""
-      # ),
-      phone_input(
+      email_input(
         inputId = ns("sign_in_email"),
+        label = tagList(icon("envelope"), "email"),
         value = ""
       ),
       tags$br()
@@ -171,13 +167,9 @@ sign_in_module_ui <- function(
         "Register"
       ),
       tags$br(),
-      # email_input(
-      #   inputId = ns("register_email"),
-      #   label = tagList(icon("envelope"), "email"),
-      #   value = ""
-      # ),
-      phone_input(
+      email_input(
         inputId = ns("register_email"),
+        label = tagList(icon("envelope"), "email"),
         value = ""
       ),
       tags$br()
@@ -308,13 +300,13 @@ sign_in_module <- function(input, output, session) {
     email <- tolower(input$sign_in_email)
 
     is_email_sign_in <- is.null(input$check_jwt$jwt)
-    # if (isTRUE(is_email_sign_in) && !is_valid_email(email)) {
-    #   shinyFeedback::showFeedbackDanger(
-    #     "sign_in_email",
-    #     text = "Invalid email"
-    #   )
-    #   return()
-    # }
+    if (isTRUE(is_email_sign_in) && !is_valid_email(email)) {
+      shinyFeedback::showFeedbackDanger(
+        "sign_in_email",
+        text = "Invalid email"
+      )
+      return()
+    }
 
     # check user invite
     invite <- NULL
@@ -353,7 +345,7 @@ sign_in_module <- function(input, output, session) {
 
 
           # user is not registered (they are accidentally attempting to sign in before
-          # they have registered), so send them to the registration page and auto populate
+          # they have registed), so send them to the registration page and auto populate
           # the registration email input
           go_to_registration_page()
 
@@ -413,13 +405,13 @@ sign_in_module <- function(input, output, session) {
 
     email <- tolower(input$register_email)
 
-    # if (!is_valid_email(email)) {
-    #   shinyFeedback::showFeedbackDanger(
-    #     "register_email",
-    #     text = "Invalid email"
-    #   )
-    #   return()
-    # }
+    if (!is_valid_email(email)) {
+      shinyFeedback::showFeedbackDanger(
+        "register_email",
+        text = "Invalid email"
+      )
+      return()
+    }
 
     invite <- NULL
     tryCatch({
@@ -464,22 +456,21 @@ sign_in_module <- function(input, output, session) {
 
 
   observeEvent(input$register_js, {
-    hold_email <- input$register_email
-    # hold_email <- input$register_js$email
+    hold_email <- input$register_js$email
     hold_password <- input$register_js$password
     cookie <- input$register_js$cookie
 
 
-    # if (!is_valid_email(hold_email)) {
-    #
-    #   shinyFeedback::showFeedbackDanger(
-    #     "register_email",
-    #     text = "Invalid email"
-    #   )
-    #   shinyFeedback::resetLoadingButton("register_submit")
-    #   return(NULL)
-    #
-    # }
+    if (!is_valid_email(hold_email)) {
+
+      shinyFeedback::showFeedbackDanger(
+        "register_email",
+        text = "Invalid email"
+      )
+      shinyFeedback::resetLoadingButton("register_submit")
+      return(NULL)
+
+    }
 
     hashed_cookie <- digest::digest(cookie)
 
@@ -510,20 +501,17 @@ sign_in_module <- function(input, output, session) {
   check_jwt_email_valid <- reactive({
     req(input$check_jwt)
 
-    # if (!is_valid_email(isolate({input$sign_in_email}))) {
-    #
-    #   shinyFeedback::showFeedbackDanger(
-    #     "sign_in_email",
-    #     text = "Invalid email"
-    #   )
-    #   shinyFeedback::resetLoadingButton("sign_in_submit")
-    #   return(NULL)
-    # }
+    if (!is_valid_email(isolate({input$sign_in_email}))) {
 
-    c(
-      email = input$sign_in_email,
-      input$check_jwt
-    )
+      shinyFeedback::showFeedbackDanger(
+        "sign_in_email",
+        text = "Invalid email"
+      )
+      shinyFeedback::resetLoadingButton("sign_in_submit")
+      return(NULL)
+    }
+
+    input$check_jwt
   })
 
   sign_in_check_jwt(

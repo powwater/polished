@@ -32,7 +32,6 @@ sign_in_js <- function(ns) {
 
   htmltools::tagList(
     shinyFeedback::useShinyFeedback(),
-    intlTelInputDependencies(),
     tags$script(src = "polish/js/toast_options.js"),
     tags$script(src = "https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"),
     firebase_deps,
@@ -43,7 +42,7 @@ sign_in_js <- function(ns) {
 
 #' Check the JWT from the user sign in
 #'
-#' This function retreives the JWT created by the JavaScript from \code{\link{sign_in_js}}
+#' This function retrieves the JWT created by the JavaScript from \code{\link{sign_in_js}}
 #' and signs the user in as long as the token can be verified.
 #' This function should be called in the server function of a shiny module.  Make sure
 #' to call \code{\link{sign_in_js}} in the UI function of this module.
@@ -66,42 +65,21 @@ sign_in_check_jwt <- function(jwt, session = shiny::getDefaultReactiveDomain()) 
 
       if (is.null(hold_jwt$jwt)) {
 
-        if (hold_jwt$email != "") {
-          # attempt sign in with email
-          new_user <- .global_sessions$sign_in_email(
-            email = hold_jwt$email,
-            password = hold_jwt$password,
-            hashed_cookie = digest::digest(hold_jwt$cookie)
-          )
+        # attempt sign in with email
+        new_user <- .global_sessions$sign_in_email(
+          email = hold_jwt$email,
+          password = hold_jwt$password,
+          hashed_cookie = digest::digest(hold_jwt$cookie)
+        )
 
-          if (!is.null(new_user$message) && identical(new_user$message, "Password reset email sent")) {
-            shinyFeedback::resetLoadingButton('sign_in_submit')
-            shinyFeedback::showToast(
-              "info",
-              "Password reset required.  Check your email to reset your password.",
-              .options = polished_toast_options
-            )
-            return()
-          }
-        } else if (hold_jwt$phone != "") {
-          # attempt sign in with phone
-          new_user <- .global_sessions$sign_in_phone(
-            phone = hold_jwt$phone,
-            password = hold_jwt$password,
-            hashed_cookie = digest::digest(hold_jwt$cookie)
+        if (!is.null(new_user$message) && identical(new_user$message, "Password reset email sent")) {
+          shinyFeedback::resetLoadingButton('sign_in_submit')
+          shinyFeedback::showToast(
+            "info",
+            "Password reset required.  Check your email to reset your password.",
+            .options = polished_toast_options
           )
-
-          # TODO:
-          #   - Password Reset w/ SMS verification (immediate)
-          # if (!is.null(new_user$message) && identical(new_user$message, "Password reset email sent")) {
-          #   shinyFeedback::resetLoadingButton('sign_in_submit')
-          #   shinyFeedback::showToast(
-          #     "info",
-          #     "Password reset required.  Check your email to reset your password.",
-          #     .options = polished_toast_options
-          #   )
-          #   return()
-          # }
+          return()
         }
 
       } else {
