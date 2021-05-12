@@ -12,12 +12,11 @@ var auth_main = function auth_main(ns_prefix) {
     cookie_options.secure = true;
   }
 
-  var sign_in = function sign_in(email, phone, password) {
+  var sign_in = function sign_in(email, password) {
     var polished_cookie = "p" + Math.random();
     Cookies.set('polished', polished_cookie, cookie_options);
     Shiny.setInputValue("".concat(ns_prefix, "check_jwt"), {
       email: email,
-      phone: phone,
       password: password,
       cookie: polished_cookie
     }, {
@@ -27,7 +26,6 @@ var auth_main = function auth_main(ns_prefix) {
 
   $(document).on("click", "#".concat(ns_prefix, "register_submit"), function () {
     var email = $("#".concat(ns_prefix, "register_email")).val().toLowerCase();
-    var phone = $("#".concat(ns_prefix, "register_phone"))[0].dataset.full_phone_number;
     var password = $("#".concat(ns_prefix, "register_password")).val();
     var password_2 = $("#".concat(ns_prefix, "register_password_verify")).val();
 
@@ -52,7 +50,6 @@ var auth_main = function auth_main(ns_prefix) {
     );
     Shiny.setInputValue("".concat(ns_prefix, "register_js"), {
       email: email,
-      phone: phone,
       password: password,
       cookie: polished_cookie
     }, {
@@ -61,8 +58,7 @@ var auth_main = function auth_main(ns_prefix) {
   });
   $(document).on("click", "#".concat(ns_prefix, "sign_in_submit"), function () {
     var email = $("#".concat(ns_prefix, "sign_in_email")).val().toLowerCase();
-    var phone = $("#".concat(ns_prefix, "sign_in_phone"))[0].dataset.full_phone_number;
     var password = $("#".concat(ns_prefix, "sign_in_password")).val();
-    sign_in(email, phone, password);
+    sign_in(email, password);
   });
 };

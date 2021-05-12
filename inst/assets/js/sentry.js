@@ -3,19 +3,19 @@
 /*
 *
 * @param sentry_dsn the Sentry.io DSN for your JavaScript project
-* @param app_uid the polished app uid.
+* @param app_name the polished app uid.
 * @param user the polished user
 * @param r_env the R environment returned from Sys.getenv("R_CONFIG_ACTIVE")
 * @param the page of the app that the user is on
 *
 */
-var sentry_init = function sentry_init(sentry_dsn, app_uid) {
+var sentry_init = function sentry_init(sentry_dsn, app_name) {
   var user = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
   var r_env = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : "default";
   var page = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
   Sentry.init({
     dsn: sentry_dsn,
-    release: app_uid,
+    release: app_name,
     attachStacktrace: true,
     sendDefaultPii: true,
     autoSessionTracking: true,
