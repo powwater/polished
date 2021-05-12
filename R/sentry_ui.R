@@ -9,7 +9,7 @@
 #'
 #' @noRd
 #'
-sentry_ui <- function(sentry_dsn, app_uid, user = NULL, r_env = "default") {
+sentry_ui <- function(sentry_dsn, app_name, user = NULL, r_env = "default") {
 
 
   user_json <- jsonlite::toJSON(user, auto_unbox = TRUE)
@@ -27,7 +27,7 @@ sentry_ui <- function(sentry_dsn, app_uid, user = NULL, r_env = "default") {
         sprintf(
           "sentry_init('%s', '%s', %s, '%s', '%s')",
           sentry_dsn,
-          app_uid,
+          app_name,
           user_json,
           r_env,
           page

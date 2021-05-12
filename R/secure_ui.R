@@ -122,7 +122,7 @@ secure_ui <- function(
 
       sentry_ui_out <- sentry_ui(
         sentry_dsn = sentry_dsn,
-        app_uid = paste0(getOption("polished")$app_name, "@", getOption("polished")$app_uid),
+        app_name = getOption("polished")$app_name,
         user = user,
         r_env = if (Sys.getenv("R_CONFIG_ACTIVE") == "") "default" else Sys.getenv("R_CONFIG_ACTIVE")
       )

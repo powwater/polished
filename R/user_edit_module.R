@@ -4,7 +4,7 @@
 #' @param output Shiny sever function output
 #' @param session Shiny server function session
 #' @param modal_title the title for the modal
-#' @param user_to_edit reactive - a one row data frame of the user to edit from the "app_users" table.
+#' @param user_to_edit reactive - a one row data frame of the user to edit from the "users" table.
 #' @param open_modal_trigger reactive - a trigger to open the modal
 #' @param existing_users reactive data frame of all users of this app.  This is used to check that the user
 #' does not add a user that already exists.
@@ -28,39 +28,6 @@ user_edit_module <- function(input, output, session,
   ns <- session$ns
 
   app_url <- reactiveVal(NULL)
-
-  # get the app_url
-  observeEvent(open_modal_trigger(), {
-
-    tryCatch({
-      res <- httr::GET(
-        url = paste0(getOption("polished")$api_url, "/apps"),
-        query = list(
-          app_uid = getOption("polished")$app_uid
-        ),
-        httr::authenticate(
-          user = getOption("polished")$api_key,
-          password = ""
-        ),
-        config = list(http_version = 0)
-      )
-
-      res_content <- jsonlite::fromJSON(
-        httr::content(res, type = "text", encoding = "UTF-8")
-      )
-
-      if (!identical(httr::status_code(res), 200L)) {
-        app_url(NULL)
-        stop(res_content, call. = FALSE)
-      } else {
-        app_url(res_content$app_url)
-      }
-
-    }, error = function(err) {
-      print(err)
-    })
-
-  }, priority = 1)
 
   shiny::observeEvent(open_modal_trigger(), {
     hold_user <- user_to_edit()
@@ -213,10 +180,7 @@ user_edit_module <- function(input, output, session,
           stop(err, call. = FALSE)
         }
 
-
-
         shiny::removeModal()
-
 
         users_trigger(users_trigger() + 1)
         shinyFeedback::showToast(
@@ -226,39 +190,11 @@ user_edit_module <- function(input, output, session,
         )
       }, error = function(err) {
 
-        if (err$message == "unique user limit exceeded") {
-          shinyFeedback::showToast(
-            "error",
-            shiny::HTML(
-              paste0(
-                tags$div(
-                  class = "text-center",
-                  "Unique User Limit Exceeded!",
-                  tags$br(),
-                  "For unlimited users, enable billing in the ",
-                  tags$a(
-                    href = "https://dashboard.polished.tech",
-                    target = "_blank",
-                    tags$b("Polished Dashboard"),
-                    shiny::icon("external-link-alt")
-                  )
-                )
-              )
-            ),
-            .options = list(
-              positionClass = "toast-top-center",
-              newestOnTop = TRUE,
-              timeOut = 0,
-              extendedTimeOut = 0
-            )
-          )
-        } else {
-          shinyFeedback::showToast(
-            "error",
-            err$message,
-            .options = polished_toast_options
-          )
-        }
+        shinyFeedback::showToast(
+          "error",
+          err$message,
+          .options = polished_toast_options
+        )
 
         print(err)
       })
@@ -269,14 +205,11 @@ user_edit_module <- function(input, output, session,
       shiny::removeModal()
 
       tryCatch({
-
-
         # update the app user
         res <- httr::PUT(
-          url = paste0(getOption("polished")$api_url, "/app-users"),
+          url = paste0(getOption("polished")$api_url, "/users"),
           body = list(
             user_uid = hold_user$user_uid,
-            app_uid = getOption("polished")$app_uid,
             is_admin = is_admin_out,
             req_user_uid = session$userData$user()$user_uid
           ),
