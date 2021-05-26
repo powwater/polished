@@ -23,7 +23,6 @@ user_access_module_ui <- function(id) {
           }"
         )
       ),
-      intlTelInputDependencies(),
       shinydashboard::box(
         width = 12,
         title = "Users",
@@ -92,15 +91,13 @@ user_access_module <- function(input, output, session) {
   users <- reactive({
     users_trigger()
 
-    hold_app_name <- getOption("polished")$app_uid
-
     out <- NULL
     tryCatch({
 
       res <- httr::GET(
-        url = paste0(getOption("polished")$api_url, "/app-users"),
+        url = paste0(getOption("polished")$api_url, "/users"),
         query = list(
-          app_uid = getOption("polished")$app_uid
+          app_name = getOption("polished")$app_name
         ),
         httr::authenticate(
           user = getOption("polished")$api_key,
@@ -115,26 +112,16 @@ user_access_module <- function(input, output, session) {
         httr::content(res, "text", encoding = "UTF-8")
       )
 
+
       if (length(app_users) == 0) {
         app_users <- tibble::tibble(
           "uid" = character(0),
-          "app_uid" = character(0),
-          "user_uid" = character(0),
+          "app_name" = character(0),
           "is_admin" = logical(0),
           "created_at" = as.POSIXct(character(0)),
-          "email" = character(0),
-          "phone" = character(0)
+          "email" = character(0)
         )
       } else {
-
-        # Account for empty Email or Phone column
-        #   - Shouldn't happen after a while
-        if (is.null(app_users$phone)) {
-          app_users$phone <- NA_character_
-        } else if (is.null(app_users$email)) {
-          app_users$email <- NA_character_
-        }
-
         app_users <- app_users %>%
           mutate(created_at = as.POSIXct(.data$created_at))
       }
@@ -143,7 +130,7 @@ user_access_module <- function(input, output, session) {
       res <- httr::GET(
         url = paste0(getOption("polished")$api_url, "/last-active-session-time"),
         query = list(
-          app_uid = getOption("polished")$app_uid
+          app_name = getOption("polished")$app_name
         ),
         httr::authenticate(
           user = getOption("polished")$api_key,
@@ -170,7 +157,7 @@ user_access_module <- function(input, output, session) {
         mutate(last_sign_in_at = lubridate::force_tz(lubridate::as_datetime((.data$last_sign_in_at)), tzone = "UTC"))
 
       out <- app_users %>%
-        left_join(last_active_times, by = 'user_uid')
+        left_join(last_active_times, by = c("uid" = 'user_uid'))
 
     }, error = function(err) {
 
@@ -203,21 +190,21 @@ user_access_module <- function(input, output, session) {
 
         if (.global_sessions$get_admin_mode()) {
           buttons_out <- paste0('<div class="btn-group" style="width: 105px" role="group" aria-label="User Action Buttons">
-            <button class="btn btn-default btn-sm sign_in_as_btn" data-toggle="tooltip" data-placement="top" title="Sign In As" id = ', the_row$user_uid, ' style="margin: 0" disabled><i class="fas fa-user-astronaut"></i></button>
-            <button class="btn btn-primary btn-sm edit_btn" data-toggle="tooltip" data-placement="top" title="Edit User" id = ', the_row$user_uid, ' style="margin: 0"><i class="fa fa-pencil-square-o"></i></button>
-            <button class="btn btn-danger btn-sm delete_btn" id = ', the_row$user_uid, ' style="margin: 0" disabled><i class="fa fa-trash-o"></i></button>
+            <button class="btn btn-default btn-sm sign_in_as_btn" data-toggle="tooltip" data-placement="top" title="Sign In As" id = ', the_row$uid, ' style="margin: 0" disabled><i class="fas fa-user-astronaut"></i></button>
+            <button class="btn btn-primary btn-sm edit_btn" data-toggle="tooltip" data-placement="top" title="Edit User" id = ', the_row$uid, ' style="margin: 0"><i class="fa fa-pencil-square-o"></i></button>
+            <button class="btn btn-danger btn-sm delete_btn" id = ', the_row$uid, ' style="margin: 0" disabled><i class="fa fa-trash-o"></i></button>
           </div>')
         } else if (isTRUE(the_row$is_admin)) {
           buttons_out <- paste0('<div class="btn-group" style="width: 105px" role="group" aria-label="User Action Buttons">
-            <button class="btn btn-default btn-sm sign_in_as_btn" data-toggle="tooltip" data-placement="top" title="Sign In As" id = ', the_row$user_uid, ' style="margin: 0"><i class="fas fa-user-astronaut"></i></button>
-            <button class="btn btn-primary btn-sm edit_btn" data-toggle="tooltip" data-placement="top" title="Edit User" id = ', the_row$user_uid, ' style="margin: 0"><i class="fa fa-pencil-square-o"></i></button>
-            <button class="btn btn-danger btn-sm delete_btn" id = ', the_row$user_uid, ' style="margin: 0" disabled><i class="fa fa-trash-o"></i></button>
+            <button class="btn btn-default btn-sm sign_in_as_btn" data-toggle="tooltip" data-placement="top" title="Sign In As" id = ', the_row$uid, ' style="margin: 0"><i class="fas fa-user-astronaut"></i></button>
+            <button class="btn btn-primary btn-sm edit_btn" data-toggle="tooltip" data-placement="top" title="Edit User" id = ', the_row$uid, ' style="margin: 0"><i class="fa fa-pencil-square-o"></i></button>
+            <button class="btn btn-danger btn-sm delete_btn" id = ', the_row$uid, ' style="margin: 0" disabled><i class="fa fa-trash-o"></i></button>
           </div>')
         } else {
           buttons_out <- paste0('<div class="btn-group" style="width: 105px" role="group" aria-label="User Action Buttons">
-            <button class="btn btn-default btn-sm sign_in_as_btn" data-toggle="tooltip" data-placement="top" title="Sign In As" id = ', the_row$user_uid, ' style="margin: 0"><i class="fas fa-user-astronaut"></i></button>
-            <button class="btn btn-primary btn-sm edit_btn" data-toggle="tooltip" data-placement="top" title="Edit User" id = ', the_row$user_uid, ' style="margin: 0"><i class="fa fa-pencil-square-o"></i></button>
-            <button class="btn btn-danger btn-sm delete_btn" data-toggle="tooltip" data-placement="top" title="Delete User" id = ', the_row$user_uid, ' style="margin: 0"><i class="fa fa-trash-o"></i></button>
+            <button class="btn btn-default btn-sm sign_in_as_btn" data-toggle="tooltip" data-placement="top" title="Sign In As" id = ', the_row$uid, ' style="margin: 0"><i class="fas fa-user-astronaut"></i></button>
+            <button class="btn btn-primary btn-sm edit_btn" data-toggle="tooltip" data-placement="top" title="Edit User" id = ', the_row$uid, ' style="margin: 0"><i class="fa fa-pencil-square-o"></i></button>
+            <button class="btn btn-danger btn-sm delete_btn" data-toggle="tooltip" data-placement="top" title="Delete User" id = ', the_row$uid, ' style="margin: 0"><i class="fa fa-trash-o"></i></button>
           </div>')
         }
 
@@ -232,7 +219,7 @@ user_access_module <- function(input, output, session) {
         dplyr::mutate(
           invite_status = ifelse(is.na(.data$last_sign_in_at), "Pending", "Accepted")
         ) %>%
-        dplyr::select(.data$actions, .data$email, .data$phone, .data$invite_status, .data$is_admin, .data$last_sign_in_at)
+        dplyr::select(.data$actions, .data$email, .data$invite_status, .data$is_admin, .data$last_sign_in_at)
     }
 
     if (is.null(users_table_prep())) {
@@ -254,7 +241,6 @@ user_access_module <- function(input, output, session) {
       colnames = c(
         "",
         "Email",
-        "Phone",
         "Invite Status",
         "Is Admin?",
         "Last Sign In"
@@ -270,7 +256,7 @@ user_access_module <- function(input, output, session) {
           list(targets = 0, width = "105px")
         ),
         order = list(
-          list(5, 'desc')
+          list(4, 'desc')
         ),
         # removes any lingering tooltips
         drawCallback = JS("function(settings) {
@@ -278,7 +264,7 @@ user_access_module <- function(input, output, session) {
         }")
       )
     ) %>%
-      DT::formatDate(6, method = "toLocaleString")
+      DT::formatDate(5, method = "toLocaleString")
   })
 
   users_proxy <- DT::dataTableProxy("users_table")
@@ -302,7 +288,7 @@ user_access_module <- function(input, output, session) {
   observeEvent(input$user_uid_to_edit, {
 
     out <- users() %>%
-      dplyr::filter(.data$user_uid == input$user_uid_to_edit)
+      dplyr::filter(.data$uid == input$user_uid_to_edit)
 
     user_to_edit(out)
   }, priority = 1)
@@ -329,7 +315,7 @@ user_access_module <- function(input, output, session) {
   observeEvent(input$user_uid_to_delete, {
 
     out <- users() %>%
-      dplyr::filter(.data$user_uid == input$user_uid_to_delete)
+      dplyr::filter(.data$uid == input$user_uid_to_delete)
 
     user_to_delete(out)
   }, priority = 1)
@@ -376,16 +362,16 @@ user_access_module <- function(input, output, session) {
   shiny::observeEvent(input$submit_user_delete, {
     shiny::removeModal()
 
-    user_uid <- user_to_delete()$user_uid
-    app_uid <- getOption("polished")$app_uid
+    user_uid <- user_to_delete()$uid
+    app_name <- getOption("polished")$app_name
 
     tryCatch({
 
       res <- httr::DELETE(
-        url = paste0(getOption("polished")$api_url, "/app-users"),
+        url = paste0(getOption("polished")$api_url, "/users"),
         body = list(
           user_uid = user_uid,
-          app_uid = app_uid,
+          app_name = app_name,
           req_user_uid = session$userData$user()$user_uid
         ),
         httr::authenticate(
@@ -421,14 +407,14 @@ user_access_module <- function(input, output, session) {
     hold_user <- session$userData$user()
 
     user_to_sign_in_as <- users() %>%
-      filter(.data$user_uid == input$sign_in_as_btn_user_uid) %>%
+      filter(.data$uid == input$sign_in_as_btn_user_uid) %>%
       dplyr::pull("user_uid")
 
     # sign in as another user
     .global_sessions$set_signed_in_as(
       hold_user$session_uid,
       user_to_sign_in_as,
-      user_uid = hold_user$user_uid
+      user_uid = hold_user$uid
     )
 
     # to to the Shiny app

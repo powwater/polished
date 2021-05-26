@@ -1,17 +1,17 @@
 /*
 *
 * @param sentry_dsn the Sentry.io DSN for your JavaScript project
-* @param app_uid the polished app uid.
+* @param app_name the polished app uid.
 * @param user the polished user
 * @param r_env the R environment returned from Sys.getenv("R_CONFIG_ACTIVE")
 * @param the page of the app that the user is on
 *
 */
-const sentry_init = (sentry_dsn, app_uid, user = null, r_env = "default", page = null) => {
+const sentry_init = (sentry_dsn, app_name, user = null, r_env = "default", page = null) => {
 
   Sentry.init({
     dsn: sentry_dsn,
-    release: app_uid,
+    release: app_name,
     attachStacktrace: true,
     sendDefaultPii: true,
     autoSessionTracking: true,

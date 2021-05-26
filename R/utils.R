@@ -91,7 +91,7 @@ send_invite_checkbox <- function(ns, app_url) {
         id = ns("checkbox_question"),
         icon("question-circle"),
         `data-toggle` = "tooltip",
-        `data-placement`= "top",
+        `data-placement` = "top",
         title = "You must set the App URL to send email invites. Go to https://dashboard.polished.tech to set your app URL."
       )
     )
@@ -128,8 +128,7 @@ is_valid_email <- function(x) {
 #'
 #' @param email the email address to check
 #'
-#' @return boolean - whether of not the email is already registered with the polished
-#' account
+#' @return boolean - whether or not the email is already registered
 #'
 #' @noRd
 #'
@@ -138,7 +137,8 @@ is_email_registered <- function(email) {
   user_res <- httr::GET(
     paste0(getOption("polished")$api_url, "/users"),
     query = list(
-      email = email
+      email = email,
+      app_name = getOption("polished")$app_name
     ),
     httr::authenticate(
       user = getOption("polished")$api_key,
@@ -165,4 +165,3 @@ is_email_registered <- function(email) {
 
   out
 }
-

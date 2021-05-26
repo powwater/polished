@@ -1,12 +1,12 @@
 
-api_get_invite_by_email <- function(url, api_key, email, app_uid) {
+api_get_invite_by_email <- function(url, api_key, email, app_name) {
 
 
   res <- httr::GET(
     url = paste0(url, "/invite-by-email"),
     query = list(
       email = email,
-      app_uid = app_uid
+      app_name = app_name
     ),
     httr::authenticate(
       user = api_key,
@@ -27,39 +27,11 @@ api_get_invite_by_email <- function(url, api_key, email, app_uid) {
   invite
 }
 
-api_get_invite_by_phone <- function(url, api_key, phone, app_uid) {
-
-
-  res <- httr::GET(
-    url = paste0(url, "/invite-by-phone"),
-    query = list(
-      phone = phone,
-      app_uid = app_uid
-    ),
-    httr::authenticate(
-      user = api_key,
-      password = ""
-    ),
-    config = list(http_version = 0)
-  )
-
-  invite <- jsonlite::fromJSON(
-    httr::content(res, "text", encoding = "UTF-8")
-  )
-
-  # API returns a length 0 list when there is no invite
-  if (length(invite) == 0) {
-    invite <- NULL
-  }
-
-  invite
-}
-
-api_get_invite <- function(url, api_key, app_uid, user_uid) {
+api_get_invite <- function(url, api_key, app_name, user_uid) {
   res <- httr::GET(
     url = paste0(url, "/invites"),
     query = list(
-      app_uid = app_uid,
+      app_name = app_name,
       user_uid = user_uid
     ),
     httr::authenticate(
@@ -104,6 +76,7 @@ Sessions <-  R6::R6Class(
     firebase_config = NULL,
     is_invite_required = TRUE,
     sign_in_providers = character(0),
+    is_email_verification_required = TRUE,
     is_auth_required = TRUE,
     #' @description
     #' polished Sessions configuration function
@@ -119,6 +92,7 @@ Sessions <-  R6::R6Class(
       admin_mode = FALSE,
       is_invite_required = TRUE,
       sign_in_providers = "email",
+      is_email_verification_required = TRUE,
       is_auth_required = TRUE
     ) {
 
@@ -144,6 +118,9 @@ Sessions <-  R6::R6Class(
       if (!(length(is_invite_required) == 1 && is.logical(is_invite_required))) {
         stop("invalid `is_invite_required` argument passed to `global_sessions_config()`", call. = FALSE)
       }
+      if (!(length(is_email_verification_required) == 1 && is.logical(is_email_verification_required))) {
+        stop("invalid `is_email_verification_required` argument passed to `global_sessions_config()`", call. = FALSE)
+      }
       if (!(length(is_auth_required) == 1 && is.logical(is_auth_required))) {
         stop("invalid `is_auth_required` argument passed to `global_sessions_config()`", call. = FALSE)
       }
@@ -152,6 +129,7 @@ Sessions <-  R6::R6Class(
 
       private$admin_mode <- admin_mode
       self$is_invite_required <- is_invite_required
+      self$is_email_verification_required <- is_email_verification_required
       self$is_auth_required <- is_auth_required
 
       private$refresh_jwt_pub_key()
@@ -209,17 +187,17 @@ Sessions <-  R6::R6Class(
           getOption("polished")$api_url,
           getOption("polished")$api_key,
           new_session$email,
-          getOption("polished")$app_uid
+          getOption("polished")$app_name
         )
 
         if (isFALSE(self$is_invite_required) && is.null(invite)) {
           # if invite is not required, and this is the first time that the user is signing in,
-          # then create the app_users
+          # then create the user
           res <- httr::POST(
-            url = paste0(getOption("polished")$api_url, "/app-users"),
+            url = paste0(getOption("polished")$api_url, "/users"),
             body = list(
               email = new_session$email,
-              app_uid = getOption("polished")$app_uid,
+              app_name = getOption("polished")$app_name,
               is_admin = FALSE,
               req_user_uid = "00000000-0000-0000-0000-000000000000"
             ),
@@ -237,7 +215,7 @@ Sessions <-  R6::R6Class(
             getOption("polished")$api_url,
             getOption("polished")$api_key,
             new_session$email,
-            getOption("polished")$app_uid
+            getOption("polished")$app_name
           )
 
         }
@@ -267,20 +245,7 @@ Sessions <-  R6::R6Class(
         getOption("polished")$api_url,
         getOption("polished")$api_key,
         email,
-        getOption("polished")$app_uid
-      )
-
-      return(invite)
-    },
-    get_invite_by_phone = function(phone) {
-
-      invite <- NULL
-
-      invite <- api_get_invite_by_phone(
-        getOption("polished")$api_url,
-        getOption("polished")$api_key,
-        phone,
-        getOption("polished")$app_uid
+        getOption("polished")$app_name
       )
 
       return(invite)
@@ -292,7 +257,7 @@ Sessions <-  R6::R6Class(
         url = paste0(getOption("polished")$api_url, "/session-by-cookie"),
         query = list(
           hashed_cookie = hashed_cookie,
-          app_uid = getOption("polished")$app_uid,
+          app_name = getOption("polished")$app_name,
           page = page
         ),
         httr::authenticate(
@@ -326,7 +291,7 @@ Sessions <-  R6::R6Class(
       res <- httr::POST(
         url = paste0(getOption("polished")$api_url, "/sign-in-email"),
         body = list(
-          app_uid = getOption("polished")$app_uid,
+          app_name = getOption("polished")$app_name,
           email = email,
           password = password,
           hashed_cookie = hashed_cookie,
@@ -355,7 +320,7 @@ Sessions <-  R6::R6Class(
             url = paste0(getOption("polished")$api_url, "/send-password-reset-email"),
             body = list(
               email = email,
-              app_uid = getOption("polished")$app_uid,
+              app_name = getOption("polished")$app_name,
               is_invite_required = self$is_invite_required
             ),
             httr::authenticate(
@@ -385,39 +350,6 @@ Sessions <-  R6::R6Class(
 
       session_out
     },
-    sign_in_phone = function(phone, password, hashed_cookie) {
-
-      res <- httr::POST(
-        url = paste0(getOption("polished")$api_url, "/sign-in-phone"),
-        body = list(
-          app_uid = getOption("polished")$app_uid,
-          phone = phone,
-          password = password,
-          hashed_cookie = hashed_cookie,
-          is_invite_required = self$is_invite_required
-        ),
-        encode = "json",
-        httr::authenticate(
-          user = getOption("polished")$api_key,
-          password = ""
-        ),
-        config = list(http_version = 0)
-      )
-
-      session_out <- jsonlite::fromJSON(
-        httr::content(res, "text", encoding = "UTF-8")
-      )
-
-      # TODO:
-      #   - Password Reset w/ SMS verification (immediate)
-      # if (!identical(httr::status_code(res), 200L)) {
-      #   if (identical(session_out$message, "Password reset required")) {
-      #
-      #   }
-      # }
-
-      session_out
-    },
     register_email = function(email, password, hashed_cookie) {
 
       res <- httr::POST(
@@ -427,40 +359,12 @@ Sessions <-  R6::R6Class(
           password = ""
         ),
         body = list(
-          app_uid = getOption("polished")$app_uid,
+          app_name = getOption("polished")$app_name,
           email = email,
           password = password,
           hashed_cookie = hashed_cookie,
-          is_invite_required = self$is_invite_required
-        ),
-        encode = "json",
-        config = list(http_version = 0)
-      )
-
-      session_out <- jsonlite::fromJSON(
-        httr::content(res, "text", encoding = "UTF-8")
-      )
-
-      if (!identical(httr::status_code(res), 200L)) {
-        stop(session_out$message)
-      }
-
-      session_out
-    },
-    register_phone = function(phone, password, hashed_cookie) {
-
-      res <- httr::POST(
-        url = paste0(getOption("polished")$api_url, "/register-phone"),
-        httr::authenticate(
-          user = getOption("polished")$api_key,
-          password = ""
-        ),
-        body = list(
-          app_uid = getOption("polished")$app_uid,
-          phone = phone,
-          password = password,
-          hashed_cookie = hashed_cookie,
-          is_invite_required = self$is_invite_required
+          is_invite_required = self$is_invite_required,
+          is_email_verification_required = self$is_email_verification_required
         ),
         encode = "json",
         config = list(http_version = 0)
@@ -525,7 +429,7 @@ Sessions <-  R6::R6Class(
 
       invisible(self)
     },
-    set_signed_in_as = function(session_uid, signed_in_as, user_uid = NA) {
+    set_signed_in_as = function(session_uid, signed_in_as, user_uid = NULL) {
 
       res <- httr::PUT(
         url = paste0(getOption("polished")$api_url, "/sessions"),
@@ -552,50 +456,19 @@ Sessions <-  R6::R6Class(
       invite <- api_get_invite(
         getOption("polished")$api_url,
         getOption("polished")$api_key,
-        getOption("polished")$app_uid,
+        getOption("polished")$app_name,
         user_uid
       )
 
       email <- invite$email
-      phone <- invite$phone
-
-      res <- httr::GET(
-        url = paste0(getOption("polished")$api_url, "/user-roles"),
-        query = list(
-          user_uid = user_uid
-        ),
-        httr::authenticate(
-          user = getOption("polished")$api_key,
-          password = ""
-        ),
-        encode = "json",
-        config = list(http_version = 0)
-      )
-
-      httr::stop_for_status(res)
-
-      roles_df <- jsonlite::fromJSON(
-        httr::content(res, "text", encoding = "UTF-8")
-      )
-
-      if (length(roles_df) == 0) {
-        roles_out <- NA
-      } else {
-        roles_out <- roles_df$role_name
-      }
-
 
       list(
         user_uid = user_uid,
         email = email,
-        phone = phone,
-        is_admin = invite$is_admin,
-        roles = roles_out
+        is_admin = invite$is_admin
       )
     },
     set_inactive = function(session_uid, user_uid) {
-
-
 
       res <- httr::POST(
         url = paste0(getOption("polished")$api_url, "/actions"),
@@ -648,7 +521,7 @@ Sessions <-  R6::R6Class(
         ),
         body = list(
           data = session_data,
-          app_uid = getOption("polished")$app_uid
+          app_name = getOption("polished")$app_name
         ),
         encode = "json",
         config = list(http_version = 0)
@@ -708,7 +581,7 @@ Sessions <-  R6::R6Class(
         try({
           decoded_jwt <- jose::jwt_decode_sig(firebase_token, key)
           break
-        }, silent=TRUE)
+        }, silent = TRUE)
       }
 
       if (is.null(decoded_jwt)) {

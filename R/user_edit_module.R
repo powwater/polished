@@ -4,7 +4,7 @@
 #' @param output Shiny sever function output
 #' @param session Shiny server function session
 #' @param modal_title the title for the modal
-#' @param user_to_edit reactive - a one row data frame of the user to edit from the "app_users" table.
+#' @param user_to_edit reactive - a one row data frame of the user to edit from the "users" table.
 #' @param open_modal_trigger reactive - a trigger to open the modal
 #' @param existing_users reactive data frame of all users of this app.  This is used to check that the user
 #' does not add a user that already exists.
@@ -29,39 +29,6 @@ user_edit_module <- function(input, output, session,
 
   app_url <- reactiveVal(NULL)
 
-  # get the app_url
-  observeEvent(open_modal_trigger(), {
-
-    tryCatch({
-      res <- httr::GET(
-        url = paste0(getOption("polished")$api_url, "/apps"),
-        query = list(
-          app_uid = getOption("polished")$app_uid
-        ),
-        httr::authenticate(
-          user = getOption("polished")$api_key,
-          password = ""
-        ),
-        config = list(http_version = 0)
-      )
-
-      res_content <- jsonlite::fromJSON(
-        httr::content(res, type = "text", encoding = "UTF-8")
-      )
-
-      if (!identical(httr::status_code(res), 200L)) {
-        app_url(NULL)
-        stop(res_content, call. = FALSE)
-      } else {
-        app_url(res_content$app_url)
-      }
-
-    }, error = function(err) {
-      print(err)
-    })
-
-  }, priority = 1)
-
   shiny::observeEvent(open_modal_trigger(), {
     hold_user <- user_to_edit()
     hold_app_url <- app_url()
@@ -76,12 +43,6 @@ user_edit_module <- function(input, output, session,
         value = if (is.null(hold_user)) "" else hold_user$email
       )
 
-      phone_input <- powpolished::phone_input(
-        ns("user_phone"),
-        "Phone",
-        value = if (is.null(hold_user)) "" else hold_user$email
-      )
-
       send_invite_ui <- tagList(
         br(),
         send_invite_checkbox(ns, hold_app_url)
@@ -89,7 +50,7 @@ user_edit_module <- function(input, output, session,
 
 
     } else {
-      # editing an existing user
+      # editing and existing user
 
       if (isTRUE(hold_user$is_admin)) {
         is_admin_value <- "Yes"
@@ -98,10 +59,13 @@ user_edit_module <- function(input, output, session,
       }
 
       email_input <- NULL
-      phone_input <- NULL
 
       send_invite_ui <- list()
     }
+
+
+
+
 
     shiny::showModal(
       shiny::modalDialog(
@@ -121,7 +85,6 @@ user_edit_module <- function(input, output, session,
         # modal content
         htmltools::br(),
         email_input,
-        phone_input,
         htmltools::br(),
         htmltools::div(
           class = "text-center",
@@ -134,38 +97,27 @@ user_edit_module <- function(input, output, session,
             ),
             selected = is_admin_value,
             inline = TRUE
-          ),
-          send_invite_ui
+          )#,
+          # TODO: Re-enable Send Invite (by DEFAULT)
+          # send_invite_ui
         ),
         tags$script(src = "polish/js/user_edit_module.js?version=2"),
         tags$script(paste0("user_edit_module('", ns(''), "')"))
       )
     )
 
-    if (!is.null(email_input) && !is.null(phone_input)) {
+    if (!is.null(email_input)) {
 
-      observeEvent(
-        list(
-          input$user_email,
-          input$user_phone
-        ), {
+      observeEvent(input$user_email, {
 
         hold_email <- tolower(input$user_email)
-        hold_phone <- input$user_phone
-
-        if (hold_email == "" && (is.null(hold_phone) || hold_phone == "")) {
-          shinyjs::disable("submit")
-        } else {
-          shinyjs::enable("submit")
-        }
 
         if (is_valid_email(hold_email)) {
           shinyFeedback::hideFeedback("user_email")
           shinyjs::enable("submit")
         } else {
-          # shinyjs::disable("submit")
+          shinyjs::disable("submit")
           if (hold_email != "") {
-            shinyjs::disable("submit")
             shinyFeedback::showFeedbackDanger(
               "user_email",
               text = "Invalid email"
@@ -174,17 +126,8 @@ user_edit_module <- function(input, output, session,
             shinyFeedback::hideFeedback("user_email")
           }
         }
-      }, ignoreInit = TRUE)
-
-
-      # observeEvent(input$user_phone, {
-      #   hold_phone <- input$user_phone
-      #
-      #   # TODO:
-      #   #   - Phone # Validation
-      # })
+      })
     }
-
   })
 
 
@@ -195,27 +138,27 @@ user_edit_module <- function(input, output, session,
   # the firebase function to add the user is triggered in the client side js, not in Shiny
   shiny::observeEvent(input$submit, {
     session_user <- session$userData$user()$user_uid
-
+    input_email <- tolower(input$user_email)
     input_is_admin <- input$user_is_admin
 
     is_admin_out <- if (input_is_admin == "Yes") TRUE else FALSE
 
+
     hold_user <- user_to_edit()
 
-    # adding a new user
-    if (is.null(hold_user)) {
-      input_email <- if (input$user_email == "") NULL else tolower(input$user_email)
-      input_phone <- if (is.null(input$user_phone) || input$user_phone == "") NULL else input$user_phone
+    users_params <- list(
+      input_email
+    )
 
+    if (is.null(hold_user)) {
+      # adding a new user
       tryCatch({
 
         res <- httr::POST(
-          url = paste0(getOption("polished")$api_url, "/app-users"),
+          url = paste0(getOption("polished")$api_url, "/users"),
           body = list(
             email = input_email,
-            phone = input_phone,
-            app_uid = getOption("polished")$app_uid,
-            user_uids = NULL,
+            app_name = getOption("polished")$app_name,
             is_admin = is_admin_out,
             req_user_uid = session$userData$user()$user_uid,
             send_invite_email = input$send_invite_email
@@ -237,10 +180,7 @@ user_edit_module <- function(input, output, session,
           stop(err, call. = FALSE)
         }
 
-
-
         shiny::removeModal()
-
 
         users_trigger(users_trigger() + 1)
         shinyFeedback::showToast(
@@ -250,39 +190,11 @@ user_edit_module <- function(input, output, session,
         )
       }, error = function(err) {
 
-        if (err$message == "unique user limit exceeded") {
-          shinyFeedback::showToast(
-            "error",
-            shiny::HTML(
-              paste0(
-                tags$div(
-                  class = "text-center",
-                  "Unique User Limit Exceeded!",
-                  tags$br(),
-                  "For unlimited users, enable billing in the ",
-                  tags$a(
-                    href = "https://dashboard.polished.tech",
-                    target = "_blank",
-                    tags$b("Polished Dashboard"),
-                    shiny::icon("external-link-alt")
-                  )
-                )
-              )
-            ),
-            .options = list(
-              positionClass = "toast-top-center",
-              newestOnTop = TRUE,
-              timeOut = 0,
-              extendedTimeOut = 0
-            )
-          )
-        } else {
-          shinyFeedback::showToast(
-            "error",
-            err$message,
-            .options = polished_toast_options
-          )
-        }
+        shinyFeedback::showToast(
+          "error",
+          err$message,
+          .options = polished_toast_options
+        )
 
         print(err)
       })
@@ -293,14 +205,11 @@ user_edit_module <- function(input, output, session,
       shiny::removeModal()
 
       tryCatch({
-
-
         # update the app user
         res <- httr::PUT(
-          url = paste0(getOption("polished")$api_url, "/app-users"),
+          url = paste0(getOption("polished")$api_url, "/users"),
           body = list(
             user_uid = hold_user$user_uid,
-            app_uid = getOption("polished")$app_uid,
             is_admin = is_admin_out,
             req_user_uid = session$userData$user()$user_uid
           ),

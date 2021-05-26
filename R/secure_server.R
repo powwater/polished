@@ -49,7 +49,6 @@ secure_server <- function(
           session_uid = uuid::UUIDgenerate(),
           user_uid = "00000000-0000-0000-0000-000000000000",
           email = "admin@tychobra.com",
-          phone = NA,
           is_admin = TRUE,
           hashed_cookie = character(0),
           email_verified = TRUE,
@@ -117,7 +116,7 @@ secure_server <- function(
           }
 
           user_out <- global_user[
-            c("session_uid", "user_uid", "email", "phone", "is_admin", "hashed_cookie", "email_verified", "roles")
+            c("session_uid", "user_uid", "email", "is_admin", "hashed_cookie", "email_verified", "roles")
           ]
 
           session$userData$user(user_out)
@@ -146,14 +145,17 @@ secure_server <- function(
       query_list <- shiny::getQueryString()
       hold_user <- session$userData$user()
 
-      if (isTRUE(hold_user$email_verified) || (!is.na(hold_user$phone) && !is.na(hold_user$hashed_cookie))) {
+      if (isTRUE(hold_user$email_verified) ||
+          isFALSE(.global_sessions$is_email_verification_required)) {
 
 
         is_on_admin_page <- if (
           isTRUE(.global_sessions$get_admin_mode()) ||
           identical(query_list$page, 'admin_panel')) TRUE else FALSE
 
+
         if (isTRUE(hold_user$is_admin) && isTRUE(is_on_admin_page)) {
+
 
           shiny::callModule(
             admin_module,

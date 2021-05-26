@@ -122,7 +122,7 @@ secure_ui <- function(
 
       sentry_ui_out <- sentry_ui(
         sentry_dsn = sentry_dsn,
-        app_uid = paste0(getOption("polished")$app_name, "@", getOption("polished")$app_uid),
+        app_name = getOption("polished")$app_name,
         user = user,
         r_env = if (Sys.getenv("R_CONFIG_ACTIVE") == "") "default" else Sys.getenv("R_CONFIG_ACTIVE")
       )
@@ -200,14 +200,15 @@ secure_ui <- function(
           tags$script(src = "polish/js/polished_session.js?version=2"),
           tags$script(paste0("polished_session('", user$hashed_cookie, "')"))
         )
-      } else if (isTRUE(user$email_verified) || (!is.na(user$phone) && !is.na(user$hashed_cookie))) {
+      } else if (isTRUE(user$email_verified) ||
+          isFALSE(.global_sessions$is_email_verification_required)) {
 
 
         if (identical(page_query, "account")) {
 
           # server the payments module UI
           if (is.null(account_module_ui)) {
-            stop("`account_module_ui` cannot be NULL", call. = FALSE)
+            stop("`account_module_ui`` cannot be NULL", call. = FALSE)
           } else {
             page_out <- tagList(
               account_module_ui,

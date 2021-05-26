@@ -9,7 +9,7 @@ const auth_main = (ns_prefix) => {
     cookie_options.secure = true
   }
 
-  const sign_in = (email, phone, password) => {
+  const sign_in = (email, password) => {
 
     const polished_cookie = "p" + Math.random()
 
@@ -21,7 +21,6 @@ const auth_main = (ns_prefix) => {
 
     Shiny.setInputValue(`${ns_prefix}check_jwt`, {
       email: email,
-      phone: phone,
       password: password,
       cookie: polished_cookie
     }, {
@@ -31,7 +30,6 @@ const auth_main = (ns_prefix) => {
 
   $(document).on("click", `#${ns_prefix}register_submit`, () => {
     const email = $(`#${ns_prefix}register_email`).val().toLowerCase()
-    const phone = $(`#${ns_prefix}register_phone`)[0].dataset.full_phone_number;
     const password = $(`#${ns_prefix}register_password`).val()
     const password_2 = $(`#${ns_prefix}register_password_verify`).val()
 
@@ -65,7 +63,6 @@ const auth_main = (ns_prefix) => {
 
     Shiny.setInputValue(`${ns_prefix}register_js`, {
       email: email,
-      phone: phone,
       password: password,
       cookie: polished_cookie
     }, {
@@ -80,10 +77,9 @@ const auth_main = (ns_prefix) => {
   $(document).on("click", `#${ns_prefix}sign_in_submit`, () => {
 
     const email = $(`#${ns_prefix}sign_in_email`).val().toLowerCase()
-    const phone = $(`#${ns_prefix}sign_in_phone`)[0].dataset.full_phone_number;
     const password = $(`#${ns_prefix}sign_in_password`).val()
 
-    sign_in(email, phone, password)
+    sign_in(email, password)
 
   })
 

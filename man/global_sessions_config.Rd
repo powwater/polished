@@ -10,8 +10,9 @@ global_sessions_config(
   firebase_config = NULL,
   admin_mode = FALSE,
   is_invite_required = TRUE,
-  api_url = "https://api.powwater.org",
+  api_url = "https://api.powwater.com",
   sign_in_providers = "email",
+  is_email_verification_required = TRUE,
   is_auth_required = TRUE,
   sentry_dsn = NULL
 )
@@ -41,6 +42,9 @@ invite before registering/signing in}
 
 \item{sign_in_providers}{the sign in providers to enable.  Valid values are \code{"google"}
 \code{"email"}, \code{"microsoft"}, and/or \code{"facebook"}. Defaults to \code{"email"}.}
+
+\item{is_email_verification_required}{\code{TRUE} by default.  Whether or not to require the user to
+verify their email before accessing your Shiny app.}
 
 \item{is_auth_required}{\code{TRUE} by default.  Whether or not to require users to be signed
 in to access the app.  It can be useful to set this argument to \code{FALSE} if you want to

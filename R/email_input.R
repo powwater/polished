@@ -39,8 +39,7 @@ email_input <- function(
       type = "email",
       class = "form-control",
       value = value,
-      placeholder = placeholder,
-      autocomplete = "email"
+      placeholder = placeholder
     )
   )
 }

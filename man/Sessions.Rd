@@ -14,12 +14,9 @@ this class directly.
 \item \href{#method-config}{\code{Sessions$config()}}
 \item \href{#method-sign_in_social}{\code{Sessions$sign_in_social()}}
 \item \href{#method-get_invite_by_email}{\code{Sessions$get_invite_by_email()}}
-\item \href{#method-get_invite_by_phone}{\code{Sessions$get_invite_by_phone()}}
 \item \href{#method-find}{\code{Sessions$find()}}
 \item \href{#method-sign_in_email}{\code{Sessions$sign_in_email()}}
-\item \href{#method-sign_in_phone}{\code{Sessions$sign_in_phone()}}
 \item \href{#method-register_email}{\code{Sessions$register_email()}}
-\item \href{#method-register_phone}{\code{Sessions$register_phone()}}
 \item \href{#method-refresh_email_verification}{\code{Sessions$refresh_email_verification()}}
 \item \href{#method-set_signed_in_as}{\code{Sessions$set_signed_in_as()}}
 \item \href{#method-get_signed_in_as_user}{\code{Sessions$get_signed_in_as_user()}}
@@ -40,6 +37,7 @@ polished Sessions configuration function
   admin_mode = FALSE,
   is_invite_required = TRUE,
   sign_in_providers = "email",
+  is_email_verification_required = TRUE,
   is_auth_required = TRUE
 )}\if{html}{\out{</div>}}
 }
@@ -93,15 +91,6 @@ NULL if sign in fails. If sign in is successful, a list containing the following
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-get_invite_by_phone"></a>}}
-\if{latex}{\out{\hypertarget{method-get_invite_by_phone}{}}}
-\subsection{Method \code{get_invite_by_phone()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Sessions$get_invite_by_phone(phone)}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-find"></a>}}
 \if{latex}{\out{\hypertarget{method-find}{}}}
 \subsection{Method \code{find()}}{
@@ -120,29 +109,11 @@ NULL if sign in fails. If sign in is successful, a list containing the following
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-sign_in_phone"></a>}}
-\if{latex}{\out{\hypertarget{method-sign_in_phone}{}}}
-\subsection{Method \code{sign_in_phone()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Sessions$sign_in_phone(phone, password, hashed_cookie)}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-register_email"></a>}}
 \if{latex}{\out{\hypertarget{method-register_email}{}}}
 \subsection{Method \code{register_email()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Sessions$register_email(email, password, hashed_cookie)}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-register_phone"></a>}}
-\if{latex}{\out{\hypertarget{method-register_phone}{}}}
-\subsection{Method \code{register_phone()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Sessions$register_phone(phone, password, hashed_cookie)}\if{html}{\out{</div>}}
 }
 
 }
@@ -160,7 +131,7 @@ NULL if sign in fails. If sign in is successful, a list containing the following
 \if{latex}{\out{\hypertarget{method-set_signed_in_as}{}}}
 \subsection{Method \code{set_signed_in_as()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Sessions$set_signed_in_as(session_uid, signed_in_as, user_uid = NA)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Sessions$set_signed_in_as(session_uid, signed_in_as, user_uid = NULL)}\if{html}{\out{</div>}}
 }
 
 }
